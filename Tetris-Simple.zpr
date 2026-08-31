@@ -18,7 +18,7 @@ current_source=main.cpp
 path_char=/
 [source]
 path=main.cpp
-cursor=104:17
+cursor=105:32
 open=true
 [config]
 name=Debug-Raylib

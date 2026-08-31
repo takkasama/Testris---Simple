@@ -10,7 +10,15 @@ using namespace std;
 
 
 const string PATH_TETRIMINOS = "Assets/Tetriminos";
-const string PATH_BUTTONS = "Assets/Buttons"
+const string PATH_BUTTONS = "Assets/Buttons";
+
+const int LEFT_VALUE = 0;
+const int TOP_VALUE = 1;
+const int RIGHT_VALUE = 2;
+const int BOTTOM_VALUE = 3;
+const int NONE_VALUE = 4;
+
+
 
 struct TetriminoPiece{
 	
@@ -52,6 +60,17 @@ struct TetriminoPiece{
 	int posY;
 };
 
+TetriminoPiece buildTetriminoPiece(char type, int sigTetri, int numberTetri){
+	TetriminoPiece piece;
+	piece.type = type;
+	piece.isSpecial = type == 'B';
+	piece.numberTetri = numberTetri;
+	piece.texturePath = type  + ".png";
+	piece.posX = 0;
+	piece.posY = 0;
+	
+	return piece;
+}
 
 //PILA PARA LA CONTRUCCION Y ORGANIZACION DE LA PIEZA, DE MODO QUE SE LEE DE 
 // DE DERECHA A IZQUIERDA CONVIENE LEERLA COMO UNA PILA
@@ -61,14 +80,109 @@ struct Tetrimino {
 	
 	Tetrimino * top;
 	
+	Tetrimino * prev;
+	
 };
+
+bool isEmptyTetrimino(Tetrimino * top){ return top == nullptr; }
+
+TetriminoPiece * popTetrimino(Tetrimino *& top){
+	if(isEmptyTetrimino(top)) return nullptr;
+	
+	Tetrimino *save = top;
+	
+	top = save -> prev;
+	
+	TetriminoPiece *piece = new TetriminoPiece(save->piece);	
+	delete save;
+	
+	return piece;
+}
+
+
+
+
+void pushTetrimino (Tetrimino *& top, TetriminoPiece piece){
+	Tetrimino * t = new Tetrimino();
+	
+	t->prev = nullptr;
+	t->top = nullptr;
+	t->piece = piece;
+	
+	if(isEmptyTetrimino(top))
+		t = t;
+	else
+		t->top = t;
+	
+	
+}	
+
+//CONSTRUYE TODA LA PIECE Y LA ORIENTACION COMPLETA DE ESTA
+void buildTetrimino(Tetrimino *& top, int type){	
+	
+	top = nullptr;
+	
+	switch(type){
+		
+	case 1 : 
+		pushTetrimino(top, buildTetriminoPiece(type, RIGHT_VALUE, 1));
+ 		pushTetrimino(top, buildTetriminoPiece(type, TOP_VALUE, 2));
+		pushTetrimino(top, buildTetriminoPiece(type, RIGHT_VALUE, 3));
+		pushTetrimino(top, buildTetriminoPiece(type, NONE_VALUE, 4));
+		
+		break;
+	case 2 :
+		pushTetrimino(top, buildTetriminoPiece(type, TOP_VALUE, 1));
+		pushTetrimino(top, buildTetriminoPiece(type, RIGHT_VALUE, 2));
+		pushTetrimino(top, buildTetriminoPiece(type, BOTTOM_VALUE, 3));
+		pushTetrimino(top, buildTetriminoPiece(type, NONE_VALUE, 4));
+		break;
+	case 3 :
+		pushTetrimino(top, buildTetriminoPiece(type, TOP_VALUE, 1));
+		pushTetrimino(top, buildTetriminoPiece(type, TOP_VALUE, 2));
+		pushTetrimino(top, buildTetriminoPiece(type, TOP_VALUE, 3));
+		pushTetrimino(top, buildTetriminoPiece(type, NONE_VALUE, 4));
+		break;
+	case 4 :
+		pushTetrimino(top, buildTetriminoPiece(type, RIGHT_VALUE, 1));
+		pushTetrimino(top, buildTetriminoPiece(type, BOTTOM_VALUE, 2));
+		pushTetrimino(top, buildTetriminoPiece(type, RIGHT_VALUE, 3));
+		pushTetrimino(top, buildTetriminoPiece(type, NONE_VALUE, 4));
+		break;
+	case 5 :
+		pushTetrimino(top, buildTetriminoPiece(type, BOTTOM_VALUE, 1));
+		pushTetrimino(top, buildTetriminoPiece(type, BOTTOM_VALUE, 2));
+		pushTetrimino(top, buildTetriminoPiece(type, RIGHT_VALUE, 3));
+		pushTetrimino(top, buildTetriminoPiece(type, NONE_VALUE, 4));
+		break;
+	case 6 :
+		pushTetrimino(top, buildTetriminoPiece(type, BOTTOM_VALUE, 1));
+		pushTetrimino(top, buildTetriminoPiece(type, BOTTOM_VALUE, 2));
+		pushTetrimino(top, buildTetriminoPiece(type, LEFT_VALUE, 3));
+		pushTetrimino(top, buildTetriminoPiece(type, NONE_VALUE, 4));
+		break;
+	case 7 :
+		pushTetrimino(top, buildTetriminoPiece(type, RIGHT_VALUE, 1));
+		pushTetrimino(top, buildTetriminoPiece(type, BOTTOM_VALUE, 2));
+		pushTetrimino(top, buildTetriminoPiece(type, RIGHT_VALUE, 3));
+		pushTetrimino(top, buildTetriminoPiece(type, NONE_VALUE, 4));
+		break;
+	default:
+		break;
+	}
+	
+
+	
+}
+
+
 
 
 //BOLSA PARA GUARDAR LA PIEZAS A CARGAR
 struct Bag{
 	const int MAX_SIZE = 7;
 	
-	Tetrimino Tetrimino;
+	Tetrimino tetrimino;
 	
 	Bag * queue;
 	
