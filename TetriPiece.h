@@ -1,40 +1,21 @@
 	#pragma once
 
-	// PARA EL MANEJO DE LAS POSICIONES EN EL TABLERO DEL MISMO QUE SE USARA PARA LA ROTACION DE LA PIEZAS
-	struct Position
-	{
-		int x, y;
-
-		// PARA ANIMACION DE BOTONES
-		int width, height;
-	};
-
-	Position buildPosition(int x, int y, int height, int width)
-	{
-		Position position;
-		position.x = x;
-		position.y = y;
-		position.height = height;
-		position.width = width;
-
-		return position;
-	}
-
 	struct Piece
 	{
-
-		// LAS PIEZAS SE CONTRUIRAN DE MODO QUE TENDRAN UN POSICION EN (X,Y) BASE Y SE DECREMENTARA Y AUMENTARA DICHAS POCIONES PARA EL MOV
-		Position position;
+		int x;
+		int y;
+		
 	};
 
 	Piece buildPiece(int x, int y)
 	{
 		Piece piece;
-		piece.position = buildPosition(x, y, 0, 0);
-
+		piece.x = x;
+		piece.y = y;
 		return piece;
 	}
 	
+	void updatePositionPiece(Piece &piece, int x, int y){piece.x = x; piece.y = y; }
 	
 
 	// PILA PARA LA CONTRUCCION Y ORGANIZACION DE LA PIEZA, DE MODO QUE SE LEE DE
@@ -48,8 +29,39 @@
 		// TENDRA LOS VALORES BASE DE S - Z - I - 0 - J - L - T  ADEMAS DE LOS VALORES DE D(DEFAULT) y B(BOM-SPECIAL)
 		char type;
 		
-		TetriPiece
 	};
+	
+	
+	
+	void rotatePiece(TetriPiece & tetriPiece){
+		
+		if(tetriPiece.type == 'O')
+			return;
+		
+		int auxX = tetriPiece.pieces[1].x;
+		int auxY = tetriPiece.pieces[1].y;
+		
+		
+		for(int i = 0; i < tetriPiece.SIZE; i++){
+			int newX = auxX + (tetriPiece.pieces[i].y - auxY);
+			int newY = auxY - (tetriPiece.pieces[i].x - auxX);
+			
+			updatePositionPiece(tetriPiece.pieces[i], newX, newY);
+		}
+	}
+		
+	void movePieceRight(TetriPiece & tetriPiece){
+		for(int i = 0; i < tetriPiece.SIZE; i ++)
+			tetriPiece.pieces[i].x++;
+	}
+	void movePieceLeft(TetriPiece & tetriPiece){
+		for(int i = 0; i < tetriPiece.SIZE; i++)
+			tetriPiece.pieces[i].x--;
+	}
+	void movePieceBottom(TetriPiece & tetriPiece){
+		for(int j = 0; j < tetriPiece.SIZE; j++)
+			tetriPiece.pieces[j].y++;
+	}
 
 	TetriPiece buildZ()
 	{
