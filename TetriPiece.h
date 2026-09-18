@@ -62,6 +62,11 @@
 		for(int j = 0; j < tetriPiece.SIZE; j++)
 			tetriPiece.pieces[j].y++;
 	}
+	void movePIeceTop(TetriPiece & tetriPiece){
+		for(int i =0; i < tetriPiece.SIZE; i++)
+			tetriPiece.pieces[i].y--;
+	}	
+	
 
 	TetriPiece buildZ()
 	{
@@ -149,7 +154,18 @@
 
 		return tetriPiece;
 	}
-	
+	TetriPiece buildDefault()
+	{
+		TetriPiece tetriPiece;
+		tetriPiece.pieces[0] = buildPiece(0, 0);
+		tetriPiece.pieces[1] = buildPiece(0, 0);
+		tetriPiece.pieces[2] = buildPiece(0, 0);
+		tetriPiece.pieces[3] = buildPiece(0, 0);
+		
+		tetriPiece.type = 'D';
+		
+		return tetriPiece;
+	}
 
 
 	// CONSTRUYE TODA LA PIECE Y LA ORIENTACION COMPLETA DE ESTA
@@ -163,7 +179,7 @@
 		case 'O': return buildO();
 		case 'I': return buildI();
 		case 'Z': return buildZ();
-		default : return buildS();
+		default : return buildDefault();
 		}
 	}
 	

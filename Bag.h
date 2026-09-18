@@ -56,7 +56,6 @@ QueueTetri buildQueueTetri()
 {
 	QueueTetri queueTetri;
 
-	
 	queueTetri.currentBag = new Bag(generateBag());
 
 	queueTetri.queue = nullptr;
@@ -84,27 +83,25 @@ Bag *desqueBag(QueueTetri *&node)
 {
 	if (node->queue == nullptr)
 		return nullptr;
-	
+
 	Bag *save = node->queue;
 	node->queue = save->next;
 
 	save->next = nullptr;
 
-	if(node->top == nullptr)
+	if (node->top == nullptr)
 		return nullptr;
-	
+
 	return save;
 }
 
-
-
-void verifyCurrentBag(QueueTetri *&wrap){
-	if(wrap == nullptr)
+void verifyCurrentBag(QueueTetri *&wrap)
+{
+	if (wrap == nullptr)
 		return;
-	
-	if(isEmptyBag(*wrap->currentBag)){
+
+	if (isEmptyBag(*wrap->currentBag))
+	{
 		queueCurrentBag(wrap);
 	}
-	
 }
-	
