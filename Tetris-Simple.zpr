@@ -15,11 +15,11 @@ tab_width=4
 tab_use_spaces=0
 explorer_path=.
 inherits_from=
-current_source=Board.h
+current_source=main.cpp
 path_char=/
 [source]
 path=main.cpp
-cursor=136:0
+cursor=13:45
 open=true
 [header]
 path=Bag.h
