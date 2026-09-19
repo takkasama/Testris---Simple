@@ -102,11 +102,15 @@ void cleanRow(Row *&row)
 			cleanCell(row->cell[i]);
 }
 
+
 // ORGANIZACION DE LAS FILAS ADEMAS DE ACCESO A LA PARTE INFERIOR PARA LA LECTURA DE LA VERFICACIONES DE ESTADO DE LAS FILAS
 struct Board
 {
-	const static int MAX_ROWS = 20;
-
+	const static int MAX_ROWS = 20;	
+	
+	TetriPiece currentPiece;
+	bool isActiveCurrentPiece;
+	
 	Row *top, *bottom;
 };
 
@@ -115,9 +119,63 @@ Board buildBoard()
 	Board board;
 	board.top = nullptr;
 	board.bottom = nullptr;
+	
+	
+	//SE CAMBIA EL VALOR UNA VEZ EMPIEZA EL JUEGO
+	//ESTO SERVIRA PARA LLEVAR EL CONTROL DE LA PIEZA ACTUAL
+	board.currentPiece = buildDefault();
+	board.isActiveCurrentPiece = false;
 
 	for (int i = 0; i < board.MAX_ROWS; i++)
 		addRow(board.top, board.bottom, buildRow());
 
 	return board;
 }
+
+void verifyBoard(Board & board){
+	
+	Row * current = board.bottom;
+	
+	int sumFillRows = 0;
+	while(current->prev != nullptr){
+		if(isFillRow(current)){
+			cleanRow();
+			sumFillRows++;
+		}
+	}
+	
+	//calculo de los puntos er relacion a las filas elimanas en un movimiento 
+}
+	
+	
+bool verifyPosToCurrentPiece(Board & board)
+{
+	Row * currentRow = board.top;
+	TetriPiece currentPiece = board.currentPiece;
+	for(int i = 0; i < Board::MAX_ROWS && !board.isActiveCurrentPiece; i++){
+		
+		for(int j = 0; j < TetriPiece::SIZE && !board.isActiveCurrentPiece; j++){
+			if(currentRow->cell[currentPiece.pieces[j]].isSelected){
+				board.isActiveCurrentPiece = true;
+				
+				//FIJAR POCIIONES 
+			}
+			
+		}
+	}
+}
+//SE USARA POR CADA CICLO DE JUEGO PARA ACTUALIZAR LA POS DE LAS PIEZAS
+void updateBoard(Board & board) 
+{
+	if(board.currentPiece.type != 'D'){
+		
+		verifyPosToCurrentPiece();
+		
+		movePieceBottom(board.currentPiece);
+	}
+	
+}
+	
+	
+	
+
