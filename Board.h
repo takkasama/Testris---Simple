@@ -1,9 +1,9 @@
 #pragma once
-
+#include "Bag.h"
+#include "HoldTetri.h"
 // PARA ALMACENAR UNA PIEZA Y REPRESENTAR UN ESPACIO DE COLUMNA
 struct Cell
 {
-
 	// SE DEJA EL TIPO UNICAMENTE DEBIDO A QUE UNA CELDA NO DEBE CONTENER LA PIEZA COMPLETA
 	// DE MODO QUE LA RESPONSABILIDAD DE MANEJO DE POCIONES Y EL HISTORIAL DE ESTE SE ENCARGAR LA
 	// LISTA DE REPRODUCCION
@@ -26,6 +26,7 @@ void updateCell(Cell &cell, char type, bool isSelected)
 	cell.isSelected = isSelected;
 	cell.type = type;
 }
+
 
 void cleanCell(Cell &cell)
 {
@@ -71,8 +72,9 @@ bool isFillRow(Row *row, int totalCells)
 		return false;
 
 	if (totalCells == 0)
-		return row->cell[totalCells].isSelected;
-	return row->cell[totalCells - 1].isSelected && isFillRow(row, totalCells - 1);
+		return true;
+	
+	return row->cell[totalCells].isSelected && isFillRow(row, totalCells + 1);
 }
 
 void addRow(Row *&top, Row *&botton, Row *newRow)
@@ -81,26 +83,15 @@ void addRow(Row *&top, Row *&botton, Row *newRow)
 	{
 		top = newRow;
 		botton = newRow;
+		return;
 	}
 
 	newRow->next = top;
 	top->prev = newRow;
 	top = newRow;
-
-	Row *current = top;
-
-	while (current->next != nullptr)
-		current = current->next;
-
-	botton = current;
 }
 
-void cleanRow(Row *&row)
-{
-	if (isFillRow(row, row->MAX_COLUMNS))
-		for (int i = 0; i < row->MAX_COLUMNS; i++)
-			cleanCell(row->cell[i]);
-}
+
 
 
 // ORGANIZACION DE LAS FILAS ADEMAS DE ACCESO A LA PARTE INFERIOR PARA LA LECTURA DE LA VERFICACIONES DE ESTADO DE LAS FILAS
@@ -108,8 +99,12 @@ struct Board
 {
 	const static int MAX_ROWS = 20;	
 	
+	QueueBag * queueBag;
+	HoldTetri * hold;
+	
 	TetriPiece currentPiece;
 	bool isActiveCurrentPiece;
+	HistoricalPiece * historical;
 	
 	Row *top, *bottom;
 };
@@ -125,57 +120,234 @@ Board buildBoard()
 	//ESTO SERVIRA PARA LLEVAR EL CONTROL DE LA PIEZA ACTUAL
 	board.currentPiece = buildDefault();
 	board.isActiveCurrentPiece = false;
-
+	
+	//GESTORES DE PIEZAS
+	board.queueBag =  buildQueueBag();
+	board.hold = buildHoldTetri();
+	
+	
 	for (int i = 0; i < board.MAX_ROWS; i++)
 		addRow(board.top, board.bottom, buildRow());
 
 	return board;
 }
 
-void verifyBoard(Board & board){
+void cleanRow(Board & board , Row *&row)
+{
+	if (!isFillRow(row, row->MAX_COLUMNS))
+		return;
+	
+	Row * save  = row;
+	if(save->next != nullptr)
+		save ->next->prev = save->prev;
+	if(save->prev != nullptr)
+		save ->prev->next = save->next;
+	
+	delete save;
+	
+	Row * newRow = buildRow();
+	newRow->next = board.top;
+	board.top = newRow;
+	
+	
+}
+
+Row * getRow(Board & board , int y)
+{
+	if(y > Row::MAX_COLUMNS || y < 0)
+		return nullptr;
+	
+	Row * current = board.top;
+	
+	for(int i = 0; i < y; i++)
+		current = current->next;
+	
+	return current;
+}
+
+bool isUsedCell(Board & board, int x , int y)
+{
+	if(x > Row::MAX_COLUMNS || x < 0)
+		return false;
+	if(y > Board::MAX_ROWS || y < 0)
+		return false;
+	
+	Row * row = getRow(board , y);
+	
+	if(row == nullptr)
+		return false;
+	
+	return row->cell[x].isSelected;
+}
+
+
+int getFullRows(Board & board)
+{
 	
 	Row * current = board.bottom;
 	
-	int sumFillRows = 0;
+	int sumFullRows = 0;
 	while(current->prev != nullptr){
-		if(isFillRow(current)){
-			cleanRow();
-			sumFillRows++;
+		
+		//POR SI SE LLEGA A ELIMNIAR UNA FILA GUARDAR EL PREVIO DE ESTE
+		Row * prev = current->prev;
+		
+		if(isFillRow(current, current->MAX_COLUMNS)){
+			cleanRow(board, current);
+			sumFullRows++;
 		}
+		current = prev;
 	}
 	
+	
+	return sumFullRows;
 	//calculo de los puntos er relacion a las filas elimanas en un movimiento 
 }
 	
-	
-bool verifyPosToCurrentPiece(Board & board)
-{
-	Row * currentRow = board.top;
-	TetriPiece currentPiece = board.currentPiece;
-	for(int i = 0; i < Board::MAX_ROWS && !board.isActiveCurrentPiece; i++){
-		
-		for(int j = 0; j < TetriPiece::SIZE && !board.isActiveCurrentPiece; j++){
-			if(currentRow->cell[currentPiece.pieces[j]].isSelected){
-				board.isActiveCurrentPiece = true;
-				
-				//FIJAR POCIIONES 
-			}
-			
-		}
-	}
-}
 //SE USARA POR CADA CICLO DE JUEGO PARA ACTUALIZAR LA POS DE LAS PIEZAS
-void updateBoard(Board & board) 
+bool canMoveDown(Board & board)
 {
-	if(board.currentPiece.type != 'D'){
+	TetriPiece piece = board.currentPiece;
+	for(int i = 0; i < TetriPiece::SIZE; i++){
+		int x = piece.pieces[i].x;
+		int y = piece.pieces[i + 1].y;
 		
-		verifyPosToCurrentPiece();
+		if(isUsedCell(board , x, y))
+			return false;
 		
-		movePieceBottom(board.currentPiece);
 	}
 	
+	return true;
 }
+
+bool canMoveRight(Board & board)
+{
+	TetriPiece piece = board.currentPiece;
 	
-	
+	for(int i = 0; i < TetriPiece::SIZE; i++){
+		int x = piece.pieces[i].x;
+		int y = piece.pieces[i + 1].y;
+		
+		if(isUsedCell(board , x, y))
+			return false;
+		
+	}
+	return true;
+}
 	
 
+
+bool canMoveLeft(Board & board)
+{
+	TetriPiece piece = board.currentPiece;
+	
+	for(int i = 0; i < TetriPiece::SIZE; i++){
+		int x = piece.pieces[i].x;
+		int y = piece.pieces[i - 1].y;
+		
+		if(isUsedCell(board , x, y))
+			return false;
+			
+	}
+	return  true;
+}	
+	
+bool canRotate(Board & board)
+{
+	TetriPiece piece = board.currentPiece;
+	
+	int auxX = piece.pieces[1].x;
+	int auxY = piece.pieces[1].y;
+ 	
+	for(int i = 0; i < TetriPiece::SIZE; i++){
+		
+		int x = auxX + (piece.pieces[i].y - auxY);
+		int y = auxY - (piece.pieces[i].x - auxX);
+		
+		if(isUsedCell(board, x, y));
+		return false;
+	}
+	
+	return true;
+}
+
+void lockCurrentPiece(Board & board)
+{
+	TetriPiece piece = board.currentPiece;
+	
+	for(int i =0 ; i < TetriPiece::SIZE; i++)
+	{
+		int x = piece.pieces[i].x;
+		int y = piece.pieces[i].y;
+		
+		updateCell(getRow(board, y)->cell[x] , piece.type , true);
+		
+	}
+	
+	
+}
+
+void loadNextPiece(Board & board)
+{
+	TetriPiece nextPiece = getNextPiece(board.queueBag);
+	
+	addHistoric(board.historical , board.currentPiece);
+	addHistoric(board.historical , nextPiece); 
+	
+	board.currentPiece = nextPiece;
+
+}
+
+
+void updateBoard(Board & board)
+{
+	if(canMoveDown(board)){
+		movePieceDown(board.currentPiece);
+		addHistoric(board.historical , board.currentPiece);
+		
+	}else{
+		lockCurrentPiece(board);
+		loadNextPiece(board);
+	}
+	//CALCULAR PUNTOS TOTALES
+	getFullRows(board);
+	
+}
+
+
+void moveRigth(Board & board)
+{
+	if(!canMoveRight(board))
+		return;
+
+	for(int i = 0; i < TetriPiece::SIZE; i++)
+		board.currentPiece.pieces[i].x++;
+	
+	
+	addHistoric(board.historical , board.currentPiece);
+}
+	
+void moveLeft(Board & board)
+{
+	if(!canMoveLeft(board))
+		return;
+	
+	for(int i = 0; i < TetriPiece::SIZE; i++)
+		board.currentPiece.pieces[i].x--;
+	
+	
+	addHistoric(board.historical , board.currentPiece);
+}
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

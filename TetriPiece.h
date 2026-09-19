@@ -58,11 +58,11 @@
 		for(int i = 0; i < tetriPiece.SIZE; i++)
 			tetriPiece.pieces[i].x--;
 	}
-	void movePieceBottom(TetriPiece & tetriPiece){
+	void movePieceDown(TetriPiece & tetriPiece){
 		for(int j = 0; j < tetriPiece.SIZE; j++)
 			tetriPiece.pieces[j].y++;
 	}
-	void movePIeceTop(TetriPiece & tetriPiece){
+	void movePIeceUp(TetriPiece & tetriPiece){
 		for(int i =0; i < tetriPiece.SIZE; i++)
 			tetriPiece.pieces[i].y--;
 	}	

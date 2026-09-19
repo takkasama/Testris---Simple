@@ -45,26 +45,26 @@ bool isEmptyBag(Bag bag) { return bag.curentPieces < 0; }
 // ESTA ESTRUCTRA SIRVE PARA LLEVAR EL CONTROL DE LAS BOLSAS DE MODO QUE FUNCIONA COMO UNA COLA
 // Y LLEVA LA COLA ACTUAL ACTUALIZANDO ESTA SI ESTA VACIA, DONDE LA ESTRUCTURA NO SE APUNTO A SU SIGUIENTE
 // SI NO QUE QUE APUNTA LA COLA DE LA BOLSA, SIRVE COMO UN ENVOLTORIO
-struct QueueTetri
+struct QueueBag
 {
 	Bag *currentBag;
 
 	Bag *queue, *top;
 };
 
-QueueTetri buildQueueTetri()
+QueueBag * buildQueueBag()
 {
-	QueueTetri queueTetri;
+	QueueBag * queueBag;
 
-	queueTetri.currentBag = new Bag(generateBag());
+	queueBag->currentBag = new Bag(generateBag());
 
-	queueTetri.queue = nullptr;
-	queueTetri.top = nullptr;
+	queueBag->queue = nullptr;
+	queueBag->top = nullptr;
 
-	return queueTetri;
+	return queueBag;
 }
 
-void queueCurrentBag(QueueTetri *&node)
+void queueCurrentBag(QueueBag *&node)
 {
 
 	Bag *current = node->currentBag;
@@ -79,7 +79,7 @@ void queueCurrentBag(QueueTetri *&node)
 	node->top = current;
 }
 
-Bag *desqueBag(QueueTetri *&node)
+Bag *desqueBag(QueueBag *& node)
 {
 	if (node->queue == nullptr)
 		return nullptr;
@@ -95,13 +95,22 @@ Bag *desqueBag(QueueTetri *&node)
 	return save;
 }
 
-void verifyCurrentBag(QueueTetri *&wrap)
+void verifyCurrentBag(QueueBag * & node)
 {
-	if (wrap == nullptr)
+	if(node == nullptr)
 		return;
+	
+	if (isEmptyBag(*node->currentBag))
+		queueCurrentBag(node);	
+}
 
-	if (isEmptyBag(*wrap->currentBag))
-	{
-		queueCurrentBag(wrap);
-	}
+
+TetriPiece getNextPiece(QueueBag *&  node)
+{
+	verifyCurrentBag(node);
+	
+	TetriPiece piece = getTetripieceToBag(*node->currentBag);
+	
+	return piece;
+	
 }
