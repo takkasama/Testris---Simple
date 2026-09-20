@@ -6,51 +6,13 @@
 #include "raylib.h"
 #include "raymath.h" // incluye Lerp, Vector2Lerp, etc.
 
-#include "Bag.h"
+#include "Board.h"
 
 using namespace std;
 
 
 const string PATH_PIECES = "Assets/TetriPieces";
 const string PATH_BUTTONS = "Assets/Buttons";	
-
-
-struct HistoricalPiece
-{
-	TetriPiece tetriPiece;
-	int pos;
-	
-	HistoricalPiece * next , * prev;
-};
-
-
-HistoricalPiece * buildHistoric()
-{
-	HistoricalPiece * historic = new HistoricalPiece;
-	historic->tetriPiece = buildDefault();
-	
-	historic->pos = 0;
-	
-	historic->next = nullptr;
-	historic->prev = nullptr;
-	
-	return historic;
-}
-
-
-void addHistoric(HistoricalPiece *& historic, TetriPiece tetripiece){
-	HistoricalPiece * newHistoric = buildHistoric();
-	
-	if(historic == nullptr){
-		historic = newHistoric;
-		historic->pos = 1;
-		return;
-	}
-	
-	//HistoricalPiece  * current = historic;
-	
-}
-
 
 
 	

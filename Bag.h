@@ -1,5 +1,4 @@
 #pragma once
-#include "TetriPiece.h"
 
 struct Bag
 {
@@ -54,7 +53,7 @@ struct QueueBag
 
 QueueBag * buildQueueBag()
 {
-	QueueBag * queueBag;
+	QueueBag * queueBag = new QueueBag;
 
 	queueBag->currentBag = new Bag(generateBag());
 

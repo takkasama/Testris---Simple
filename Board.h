@@ -1,4 +1,5 @@
 #pragma once
+#include "HistoricalPiece.h"
 #include "Bag.h"
 #include "HoldTetri.h"
 // PARA ALMACENAR UNA PIEZA Y REPRESENTAR UN ESPACIO DE COLUMNA

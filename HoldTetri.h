@@ -1,5 +1,4 @@
 #pragma once
-#include "TetriPiece.h"
 
 struct HoldTetri
 {
@@ -8,7 +7,7 @@ struct HoldTetri
 
 HoldTetri * buildHoldTetri()
 {
-	HoldTetri * holdTetri;
+	HoldTetri * holdTetri = new HoldTetri;
 	holdTetri->tetriPiece = buildDefault();
 	
 	return holdTetri;
