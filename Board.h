@@ -96,6 +96,7 @@ void addRow(Row *&top, Row *&botton, Row *newRow)
 
 
 // ORGANIZACION DE LAS FILAS ADEMAS DE ACCESO A LA PARTE INFERIOR PARA LA LECTURA DE LA VERFICACIONES DE ESTADO DE LAS FILAS
+//ELEMENTO CENTRAL DE LA LOGICA DE JUEGO	
 struct Board
 {
 	const static int MAX_ROWS = 20;	
@@ -310,8 +311,7 @@ void updateBoard(Board & board)
 		lockCurrentPiece(board);
 		loadNextPiece(board);
 	}
-	//CALCULAR PUNTOS TOTALES
-	getFullRows(board);
+
 	
 }
 
