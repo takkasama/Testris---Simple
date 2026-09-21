@@ -6,7 +6,7 @@
 
 // CONSTANTE QUE INCARA CUANTO IRA DISMINUYENDO POR NIVEL
 const float SPEED_MODIFIER = 0.007f;// VELOCIDAD BASE
-const float INITIAL_SPEED = 2.0f;
+const float INITIAL_SPEED = 1.5f;
 
 // FORMULA DE CALCULO DE PUNTOS POR FILA EN RELACION AL NIVEL ACTUAL Y LA LA CANTIDAD DE PUNTOS BASE
 // PARA CADA MOVIENTO HECHO SIN NECESIDAD DE ELMINAR UNA PIEZA
@@ -16,7 +16,6 @@ const int POINTS_SIMPLE = 40;
 const int POINTS_DOUBLE = 100;
 const int POINTS_TRIPLE = 300;
 const int POINTS_TETRIS = 1200;
-
 
 // CONTANTES EL BOARD Y LOS TETRIS
 // CONDICION PARA SUBIR DE NIVEL , LA CUAL SERIA EL NIVEL MULTIPLICADO POR LAS FILAS SI LAS FILAS ACTUALES SON MAYORES A ELLO SE AUMENTA EL NIVEL
@@ -34,8 +33,6 @@ const int TOTAL_ROWS = 20;
 const float CELL_WIDTH = BOARD_WIDTH / TOTAL_COLUMNS;
 const float CELL_HEIGHT = BOARD_HEIGHT / TOTAL_ROWS;
 
-
-
 //CONSTANTES PARA BOTONES 
 const float BUTTON_Y = 875.0f;
 const float BUTTON_1_X = 153.0f;
@@ -43,6 +40,19 @@ const float BUTTON_2_X = 265.0f;
 const float BUTTON_3_X = 377.0f;
 const float BUTTON_4_X = 489.0f;
 
+
+const float KEY_DELAY = 0.09f;
+
+//CONSTANTES DE LOS RECUADROS PARA MOSTRAR SIGUIENTE DE LA FICHA
+const float NEXT_X = 510.0f;
+const float NEXT_1_Y = 210.0f;
+const float NEXT_2_Y = 340.0f;
+const float NEXT_3_Y = 465.0f;
+
+
+//CONSTANTES PARA EL ESPACIO DE HOLD_PIECE
+const float HOLD_X = 480.0f;
+const float HOLD_Y = 620.0f;
 
 
 struct Level
@@ -109,6 +119,8 @@ struct Game
 	
 	float updateTimer;
 
+	float keyTimer;
+	
 	// PARA EL MANEJO DE LAS PERSITENCIA LOCAL EL GUARDADO DE PUNTOS POR JUEGADOR
 	// Player player;
 };
@@ -123,7 +135,20 @@ void loadTextures(Game &game)
 	addTexture(game.textures, "TetriS", true);
 	addTexture(game.textures, "TetriT", true);
 	addTexture(game.textures, "TetriZ", true);
+	addTexture(game.textures, "TetriD", true);
+	
 
+	addTexture(game.textures, "TetriCI", true);
+	addTexture(game.textures, "TetriCJ", true);
+	addTexture(game.textures, "TetriCL", true);
+	addTexture(game.textures, "TetriCO", true);
+	addTexture(game.textures, "TetriCS", true);
+	addTexture(game.textures, "TetriCT", true);
+	addTexture(game.textures, "TetriCZ", true);
+	
+	
+	
+	
 	addTexture(game.textures, "start", false);
 	addTexture(game.textures, "pause", false);
 	addTexture(game.textures, "retry", false);
@@ -132,6 +157,10 @@ void loadTextures(Game &game)
 	addTexture(game.textures, "topRecords", false);
 	addTexture(game.textures, "info", false);
 
+	addTexture(game.textures, "back", false);
+	addTexture(game.textures, "advance", false);
+	
+	
 	addTexture(game.textures, "exit", false);
 	addTexture(game.textures, "settings", false);
 
@@ -143,6 +172,10 @@ void loadTextures(Game &game)
 
 	addTexture(game.textures, "board", false);
 	addTexture(game.textures, "background", false);
+	
+	
+	
+	
 }
 
 Game builGame()
@@ -152,6 +185,7 @@ Game builGame()
 	game.level = buildLevel();
 
 	game.updateTimer = 0.0f;
+	game.keyTimer = 0.0f;
 	
 	game.textures = nullptr;
 	loadTextures(game);
@@ -162,6 +196,17 @@ Game builGame()
 Position getTexturePosition(int x, int y)
 {
 	 return buildPosition(BOARD_X + x * CELL_WIDTH , BOARD_Y + y * CELL_HEIGHT);
+}
+
+Position getTexturePositionToNextPieces(int numbrePiece)
+{
+	if(numbrePiece == 0)
+		return buildPosition(NEXT_X , NEXT_1_Y);
+
+	if(numbrePiece == 1)
+		return buildPosition(NEXT_X , NEXT_2_Y);
+	
+	return buildPosition(NEXT_X , NEXT_3_Y);
 }
 
 void drawPiecesTextures(Game & game)
@@ -225,6 +270,45 @@ void drawButtonsBoard(Game & game)
 }
 
 
+//SE CONTRUYO EL TABLERO CON UNA FILA DE MAS, POR LO QUE DICHA FILA SE CONTRUYE CON UN FILA DE TETRI DEFAULT 
+void drawLastRow(Game & game)
+{
+	TetriPiece defaultPiece = buildDefault();
+	defaultPiece.pieces[0].y = 20;
+	
+	for(int i = 0; i < Row::MAX_COLUMNS; i++){
+		
+		Position pos = buildPosition(defaultPiece.pieces[0].x , defaultPiece.pieces[0].y);
+		
+		pos  = getTexturePosition(pos.x , pos.y);
+		drawTexture(game.textures, "TetriD" , pos);
+		
+		defaultPiece.pieces[0].x++;
+	}
+}
+
+void drawNextPieces(Game & game)
+{
+	
+	for(int i = 0; i < Bag::WAIT_SIZE; i++){
+		TetriPiece piece = game.board.queueBag->currentBag->waitPieces[i];
+		
+		string nameImg  = "TetriC" + string(1 , piece.type);
+		
+		drawTexture(game.textures, nameImg, getTexturePositionToNextPieces(i));
+		
+	}
+
+}
+
+void setCurrentPieceToHold(Game & game)
+{
+	
+}
+
+
+
+
 void updateGame(Game &game, float deltaTime)
 {
 	
@@ -237,4 +321,33 @@ void updateGame(Game &game, float deltaTime)
 		updateBoard(game.board);
 		updateLevel(game.level, getFullRows(game.board));
 	}
+	
+	
 }
+
+void movePieces(Game & game, bool left , bool right ,
+				bool rotate, bool isToBottom ,float deltaTime)
+{
+	game.keyTimer += deltaTime;
+	
+	if(game.keyTimer >= KEY_DELAY)
+	{
+		game.keyTimer = 0.0f;
+		
+		if(left)
+			moveLeft(game.board);
+		if(right)
+			moveRight(game.board);
+		if(rotate && canRotate(game.board))
+			rotatePiece(game.board.currentPiece);
+		if(isToBottom)
+			moveToBottom(game.board);
+	}
+}
+
+
+
+
+
+
+
