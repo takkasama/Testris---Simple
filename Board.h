@@ -66,16 +66,16 @@ bool isSelectedCell(Row *row, int posX)
 	return row->cell[posX].isSelected;
 }
 
-bool isFillRow(Row *row, int totalCells)
+bool isFillRow(Row *row, int pos)
 {
 
 	if (isEmptyRow(row))
 		return false;
 
-	if (totalCells == 0)
+	if (pos == 0)
 		return true;
 	
-	return row->cell[totalCells].isSelected && isFillRow(row, totalCells + 1);
+	return row->cell[pos].isSelected && isFillRow(row, 0);
 }
 
 void addRow(Row *&top, Row *&botton, Row *newRow)
@@ -120,12 +120,15 @@ Board buildBoard()
 	
 	//SE CAMBIA EL VALOR UNA VEZ EMPIEZA EL JUEGO
 	//ESTO SERVIRA PARA LLEVAR EL CONTROL DE LA PIEZA ACTUAL
-	board.currentPiece = buildDefault();
 	board.isActiveCurrentPiece = false;
 	
 	//GESTORES DE PIEZAS
 	board.queueBag =  buildQueueBag();
 	board.hold = buildHoldTetri();
+	
+	board.historical = nullptr;
+	board.currentPiece = getNextPiece(board.queueBag);
+	
 	
 	
 	for (int i = 0; i < board.MAX_ROWS; i++)
@@ -156,12 +159,12 @@ void cleanRow(Board & board , Row *&row)
 
 Row * getRow(Board & board , int y)
 {
-	if(y > Row::MAX_COLUMNS || y < 0)
+	if(y < 0 || y >= Board::MAX_ROWS)		
 		return nullptr;
 	
 	Row * current = board.top;
 	
-	for(int i = 0; i < y; i++)
+	for(int i = 0; i < y && current != nullptr; i++)
 		current = current->next;
 	
 	return current;
@@ -169,15 +172,16 @@ Row * getRow(Board & board , int y)
 
 bool isUsedCell(Board & board, int x , int y)
 {
-	if(x > Row::MAX_COLUMNS || x < 0)
-		return false;
-	if(y > Board::MAX_ROWS || y < 0)
-		return false;
+	if(x >= Row::MAX_COLUMNS || x < 0)
+		return true;
+	
+	if(y >= Board::MAX_ROWS || y < 0)
+		return true;
 	
 	Row * row = getRow(board , y);
 	
 	if(row == nullptr)
-		return false;
+		return true;
 	
 	return row->cell[x].isSelected;
 }
@@ -194,7 +198,7 @@ int getFullRows(Board & board)
 		//POR SI SE LLEGA A ELIMNIAR UNA FILA GUARDAR EL PREVIO DE ESTE
 		Row * prev = current->prev;
 		
-		if(isFillRow(current, current->MAX_COLUMNS)){
+		if(isFillRow(current, 0)){
 			cleanRow(board, current);
 			sumFullRows++;
 		}
@@ -212,7 +216,7 @@ bool canMoveDown(Board & board)
 	TetriPiece piece = board.currentPiece;
 	for(int i = 0; i < TetriPiece::SIZE; i++){
 		int x = piece.pieces[i].x;
-		int y = piece.pieces[i + 1].y;
+		int y = piece.pieces[i].y + 1;
 		
 		if(isUsedCell(board , x, y))
 			return false;
@@ -227,8 +231,8 @@ bool canMoveRight(Board & board)
 	TetriPiece piece = board.currentPiece;
 	
 	for(int i = 0; i < TetriPiece::SIZE; i++){
-		int x = piece.pieces[i].x;
-		int y = piece.pieces[i + 1].y;
+		int x = piece.pieces[i].x + 1;
+		int y = piece.pieces[i].y;
 		
 		if(isUsedCell(board , x, y))
 			return false;
@@ -245,7 +249,7 @@ bool canMoveLeft(Board & board)
 	
 	for(int i = 0; i < TetriPiece::SIZE; i++){
 		int x = piece.pieces[i].x;
-		int y = piece.pieces[i - 1].y;
+		int y = piece.pieces[i].y - 1;
 		
 		if(isUsedCell(board , x, y))
 			return false;
@@ -266,8 +270,8 @@ bool canRotate(Board & board)
 		int x = auxX + (piece.pieces[i].y - auxY);
 		int y = auxY - (piece.pieces[i].x - auxX);
 		
-		if(isUsedCell(board, x, y));
-		return false;
+		if(isUsedCell(board, x, y))
+			return false;
 	}
 	
 	return true;

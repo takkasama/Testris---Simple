@@ -14,13 +14,13 @@ Bag generateBag()
 	Bag bag;
 	bag.curentPieces = bag.MAX_SIZE - 1;
 
-	bag.tetriPieces[0] = buildTetriPiece('Z');
-	bag.tetriPieces[1] = buildTetriPiece('S');
-	bag.tetriPieces[2] = buildTetriPiece('T');
-	bag.tetriPieces[3] = buildTetriPiece('I');
-	bag.tetriPieces[4] = buildTetriPiece('L');
-	bag.tetriPieces[5] = buildTetriPiece('J');
-	bag.tetriPieces[6] = buildTetriPiece('O');
+	bag.tetriPieces[0] = buildZ();
+	bag.tetriPieces[1] = buildS();
+	bag.tetriPieces[2] = buildT();
+	bag.tetriPieces[3] = buildI();
+	bag.tetriPieces[4] = buildL();
+	bag.tetriPieces[5] = buildJ();
+	bag.tetriPieces[6] = buildO();
 
 	bag.next = nullptr;
 	return bag;
