@@ -165,21 +165,4 @@
 		tetriPiece.type = 'D';
 		
 		return tetriPiece;
-	}
-
-
-	// CONSTRUYE TODA LA PIECE Y LA ORIENTACION COMPLETA DE ESTA
-	TetriPiece buildTetriPiece(char type)
-	{
-		switch(type)
-		{
-		case 'T': return buildT();
-		case 'L': return buildL();
-		case 'J': return buildJ();
-		case 'O': return buildO();
-		case 'I': return buildI();
-		case 'Z': return buildZ();
-		default : return buildDefault();
-		}
-	}
-	
+	}	

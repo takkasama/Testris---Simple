@@ -2,14 +2,13 @@
 #include "TextureGame.h"
 #include "Board.h"
 
-// CONSTANTE QUE INCARA CUANTO IRA DISMINUYENDO POR NIVEL
-const float SPEED_MODIFIER = 0.007f;
+//CONSTANTES MODIFICADORAS O DE CONTROL DE JUEGO
 
-// VELOCIDAD BASE
+// CONSTANTE QUE INCARA CUANTO IRA DISMINUYENDO POR NIVEL
+const float SPEED_MODIFIER = 0.007f;// VELOCIDAD BASE
 const float INITIAL_SPEED = 2.0f;
 
 // FORMULA DE CALCULO DE PUNTOS POR FILA EN RELACION AL NIVEL ACTUAL Y LA LA CANTIDAD DE PUNTOS BASE
-
 // PARA CADA MOVIENTO HECHO SIN NECESIDAD DE ELMINAR UNA PIEZA
 const int POINTS_NONE = 10;
 
@@ -18,13 +17,16 @@ const int POINTS_DOUBLE = 100;
 const int POINTS_TRIPLE = 300;
 const int POINTS_TETRIS = 1200;
 
+
+// CONTANTES EL BOARD Y LOS TETRIS
 // CONDICION PARA SUBIR DE NIVEL , LA CUAL SERIA EL NIVEL MULTIPLICADO POR LAS FILAS SI LAS FILAS ACTUALES SON MAYORES A ELLO SE AUMENTA EL NIVEL
 const int CONDITION_UPLEVEL = 10;
 
 const float BOARD_X = 59.0f;
 const float BOARD_Y = 51.0f;
-const float BOARD_WIDTH = 363.0f;
-const float BOARD_HEIGHT = 770.0f;
+
+const float BOARD_WIDTH  = 363.0f;
+const float BOARD_HEIGHT = 734.0f;
 
 const int TOTAL_COLUMNS = 10;
 const int TOTAL_ROWS = 20;
@@ -32,11 +34,16 @@ const int TOTAL_ROWS = 20;
 const float CELL_WIDTH = BOARD_WIDTH / TOTAL_COLUMNS;
 const float CELL_HEIGHT = BOARD_HEIGHT / TOTAL_ROWS;
 
-struct Position
-{
-	float x;
-	float y;
-};
+
+
+//CONSTANTES PARA BOTONES 
+const float BUTTON_Y = 875.0f;
+const float BUTTON_1_X = 153.0f;
+const float BUTTON_2_X = 265.0f;
+const float BUTTON_3_X = 377.0f;
+const float BUTTON_4_X = 489.0f;
+
+
 
 struct Level
 {
@@ -109,13 +116,13 @@ struct Game
 void loadTextures(Game &game)
 {
 
-	addTexture(game.textures, "tetriI", true);
-	addTexture(game.textures, "tetriJ", true);
-	addTexture(game.textures, "tetriL", true);
-	addTexture(game.textures, "tetriO", true);
-	addTexture(game.textures, "tetriS", true);
-	addTexture(game.textures, "tetriT", true);
-	addTexture(game.textures, "tetriZ", true);
+	addTexture(game.textures, "TetriI", true);
+	addTexture(game.textures, "TetriJ", true);
+	addTexture(game.textures, "TetriL", true);
+	addTexture(game.textures, "TetriO", true);
+	addTexture(game.textures, "TetriS", true);
+	addTexture(game.textures, "TetriT", true);
+	addTexture(game.textures, "TetriZ", true);
 
 	addTexture(game.textures, "start", false);
 	addTexture(game.textures, "pause", false);
@@ -130,6 +137,9 @@ void loadTextures(Game &game)
 
 	addTexture(game.textures, "delete", false);
 	addTexture(game.textures, "close", false);
+
+	addTexture(game.textures, "board", false);
+	addTexture(game.textures, "background", false);
 
 	addTexture(game.textures, "board", false);
 	addTexture(game.textures, "background", false);
@@ -151,15 +161,10 @@ Game builGame()
 
 Position getTexturePosition(int x, int y)
 {
-	Position position;
-
-	position.x = BOARD_X + (x * CELL_WIDTH);
-	position.y = BOARD_Y + (y * CELL_HEIGHT);
-
-	return position;
+	 return buildPosition(BOARD_X + x * CELL_WIDTH , BOARD_Y + y * CELL_HEIGHT);
 }
 
-void drawPiecesTextures(Game &game)
+void drawPiecesTextures(Game & game)
 {
 	Row *currentRow = game.board.top;
 	int y = 0;
@@ -171,16 +176,11 @@ void drawPiecesTextures(Game &game)
 			if (!currentRow->cell[x].isSelected)
 				continue;
 			
-			string nameImg = "tetri" + string(1, currentRow->cell[x].type);
-			TextureGame *texture = getTexture(game.textures, nameImg);
 			
-			if (texture != nullptr)
-			{
-				
-				Position pos = getTexturePosition(x, y);
-				
-				DrawTexture(texture->texture, pos.x, pos.y, WHITE);
-			}
+			string nameImg = "Tetri" + string(1, currentRow->cell[x].type);			
+			Position pos = getTexturePosition(x, y);
+			drawTexture(game.textures, nameImg , pos);
+			
 		}
 		y++;
 		currentRow = currentRow->next;
@@ -193,12 +193,7 @@ void drawCurrentPiece(Game &game)
 
 	if (piece.type == 'D')
 		return;
-	string nameImg = "tetri" + string(1, piece.type);
-
-	TextureGame *texture = getTexture(game.textures, nameImg);
-
-	if (texture == nullptr)
-		return;
+	string nameImg = "Tetri" + string(1, piece.type);
 
 	for (int i = 0; i < TetriPiece::SIZE; i++)
 	{
@@ -207,18 +202,38 @@ void drawCurrentPiece(Game &game)
 	 
 		Position pos = getTexturePosition(x, y);
 	 
-		DrawTexture(texture->texture, pos.x, pos.y, WHITE);
+		drawTexture(game.textures , nameImg , pos);
 	}
 }
 
+
+
 void drawBackground(Game &game)
 {
+	
+	Position pos = buildPosition(0.0f , 0.0f);
+	drawTexture(game.textures , "board" , pos);
+	
 }
 
-void updateGame(Game &game)
+void drawButtonsBoard(Game & game)
+{	
+	drawTexture(game.textures, "back" ,buildPosition(BUTTON_1_X, BUTTON_Y));
+	drawTexture(game.textures, "advance" ,buildPosition(BUTTON_2_X, BUTTON_Y));
+	drawTexture(game.textures, "pause" ,buildPosition(BUTTON_3_X, BUTTON_Y));
+	drawTexture(game.textures, "retry" ,buildPosition(BUTTON_4_X, BUTTON_Y));
+}
+
+
+void updateGame(Game &game, float deltaTime)
 {
+	
+	game.updateTimer += deltaTime;
+	
 	if (game.updateTimer >= game.level.speed)
 	{
+		
+		game.updateTimer -= game.level.speed;
 		updateBoard(game.board);
 		updateLevel(game.level, getFullRows(game.board));
 	}

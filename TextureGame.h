@@ -6,8 +6,24 @@
 
 using namespace std;
 
-const string PATH_PIECES = "Assets/TetriPieces/";
+const string PATH_PIECES = "Assets/Pieces/";
 const string PATH_BUTTONS = "Assets/Background/";	
+
+
+struct Position
+{
+	float x;
+	float y;
+};
+
+Position buildPosition(float x , float y)
+{
+	Position position;
+	position.x = x;
+	position.y = y;
+
+	return position;
+}
 
 //ESTRUCTURA QUE MANEJA TODAS LAS TEXTURAS DEL JUEGO 
 struct TextureGame
@@ -67,7 +83,7 @@ void addTexture(TextureGame *&texture , string nameImg, bool isTetriTexture)
 	}
 	
 	newTexture->next = texture;
-	texture -> next->prev = newTexture;
+	texture ->prev = newTexture;
 	texture = newTexture;
 }
 
@@ -112,6 +128,32 @@ void cleanTextures(TextureGame *& texture)
 		
 		current = save;
 	}
+}
+
+
+bool drawTexture(TextureGame *& texture , string nameImg , Position position)
+{
+	TextureGame * aux  = getTexture(texture , nameImg);
 	
+	if(aux == nullptr)
+		return false;
+	
+	DrawTexture(aux->texture , position.x , position.y , WHITE);
+	
+	return true;
 	
 }
+
+
+bool isPressTexture(TextureGame *& texture, Position position , string nameImg)
+{	
+	TextureGame * aux = getTexture(texture , nameImg);
+	
+	if(aux == nullptr)
+		return false;
+	
+	Rectangle rectangle = {position.x , position.y , (float) aux->texture.width , (float) aux->texture.height};
+	return IsMouseButtonPressed(MOUSE_BUTTON_LEFT) 
+		&& CheckCollisionPointRec(GetMousePosition(), rectangle);
+}
+
