@@ -102,9 +102,13 @@ struct Board
 	const static int MAX_ROWS = 20;	
 	
 	QueueBag * queueBag;
+	
+	
 	HoldTetri * hold;
 	
+	//no se puede intercambiar si el tipo anterior es igual al nuevo
 	TetriPiece currentPiece;
+	
 	bool isActiveCurrentPiece;
 	HistoricalPiece * historical;
 	
@@ -139,7 +143,7 @@ Board buildBoard()
 
 void cleanRow(Board & board , Row *&row)
 {
-	if (!isFillRow(row, row->MAX_COLUMNS))
+	if (!isFillRow(row, 0))
 		return;
 	
 	Row * save  = row;
@@ -172,10 +176,10 @@ Row * getRow(Board & board , int y)
 
 bool isUsedCell(Board & board, int x , int y)
 {
-	if(x >= Row::MAX_COLUMNS || x < 0)
+	if(x < 0 || x >= Row::MAX_COLUMNS)
 		return true;
 	
-	if(y >= Board::MAX_ROWS || y < 0)
+	if(y < 0 || y >= Board::MAX_ROWS)
 		return true;
 	
 	Row * row = getRow(board , y);
@@ -248,8 +252,8 @@ bool canMoveLeft(Board & board)
 	TetriPiece piece = board.currentPiece;
 	
 	for(int i = 0; i < TetriPiece::SIZE; i++){
-		int x = piece.pieces[i].x;
-		int y = piece.pieces[i].y - 1;
+		int x = piece.pieces[i].x - 1;
+		int y = piece.pieces[i].y;
 		
 		if(isUsedCell(board , x, y))
 			return false;
@@ -305,28 +309,37 @@ void loadNextPiece(Board & board)
 }
 
 
+void holdPiece(Board & board)
+{
+	
+	pushHold(board.hold, board.currentPiece);
+	loadNextPiece(board);
+}
+
+
 void updateBoard(Board & board)
 {
 	if(canMoveDown(board)){
 		movePieceDown(board.currentPiece);
-		addHistoric(board.historical , board.currentPiece);
-		
-	}else{
-		lockCurrentPiece(board);
-		loadNextPiece(board);
+		addHistoric(board.historical , board.currentPiece);		
+		return;
 	}
+	
+	lockCurrentPiece(board);
+
+	getFullRows(board);
+	
+	
+	loadNextPiece(board);
 
 	
 }
-
-
-void moveRigth(Board & board)
+void moveRight(Board & board)
 {
 	if(!canMoveRight(board))
 		return;
 
-	for(int i = 0; i < TetriPiece::SIZE; i++)
-		board.currentPiece.pieces[i].x++;
+	movePieceRight(board.currentPiece);
 	
 	
 	addHistoric(board.historical , board.currentPiece);
@@ -337,18 +350,36 @@ void moveLeft(Board & board)
 	if(!canMoveLeft(board))
 		return;
 	
-	for(int i = 0; i < TetriPiece::SIZE; i++)
-		board.currentPiece.pieces[i].x--;
+	movePieceLeft(board.currentPiece);
 	
+	
+	addHistoric(board.historical , board.currentPiece);
+}
+
+void rotate(Board & board)
+{
+	if(!canRotate(board))
+		return;
+	
+	rotatePiece(board.currentPiece);
 	
 	addHistoric(board.historical , board.currentPiece);
 }
 
 
 
+
 	
-	
-	
+void moveToBottom(Board & board)
+{
+	while(canMoveDown(board)){
+		for(int i = 0; i < TetriPiece::SIZE; i++)
+			board.currentPiece.pieces[i].y++;
+	}
+		
+	updateBoard(board);
+}
+
 	
 	
 	

@@ -158,9 +158,6 @@
 	{
 		TetriPiece tetriPiece;
 		tetriPiece.pieces[0] = buildPiece(0, 0);
-		tetriPiece.pieces[1] = buildPiece(0, 0);
-		tetriPiece.pieces[2] = buildPiece(0, 0);
-		tetriPiece.pieces[3] = buildPiece(0, 0);
 		
 		tetriPiece.type = 'D';
 		
