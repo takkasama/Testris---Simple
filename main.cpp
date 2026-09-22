@@ -1,24 +1,5 @@
 #include "Game.h"
 
-struct Player 
-{
-	string alias;
-	int points;
-	int maxRecord;
-};
-
-Player buildPlayer()
-{
-	Player player;
-	player.alias = "NONE";
-	player.points = 0;
-	player.maxRecord = 0;
-	
-	return player;
-}
-
-
-
 
 
 
@@ -39,7 +20,7 @@ int main()
 		
 		movePieces(game , 
 				   IsKeyDown(KEY_J) , IsKeyDown(KEY_L),
-				   IsKeyDown(KEY_R), IsKeyDown(KEY_SPACE),
+				   IsKeyDown(KEY_K), IsKeyDown(KEY_SPACE),
 				   IsKeyDown(KEY_F),
 				   deltaTime);
 		

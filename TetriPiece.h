@@ -163,3 +163,36 @@
 		
 		return tetriPiece;
 	}	
+	
+	
+	void resetPosition(TetriPiece & tetriPiece)
+	{
+		if(tetriPiece.type == 'S'){
+			tetriPiece = buildS();
+			return;
+		}
+		if(tetriPiece.type == 'Z'){
+			tetriPiece = buildZ();
+			return;
+		}
+		if(tetriPiece.type == 'T'){
+			tetriPiece = buildT();
+			return;
+		}
+		if(tetriPiece.type == 'J'){
+			tetriPiece = buildJ();
+			return;
+		}
+		if(tetriPiece.type == 'L'){
+			tetriPiece = buildL();
+			return;
+		}
+		if(tetriPiece.type == 'O'){
+			tetriPiece = buildO();
+			return;
+		}
+		if(tetriPiece.type == 'I'){
+			tetriPiece = buildI();
+			return;
+		}	
+	}

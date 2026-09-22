@@ -38,6 +38,9 @@ void pushHold(HoldTetri *&node, TetriPiece tetriPiece)
 	newHold->tetriPiece = tetriPiece;
 	
 	node->next = newHold;
+	
+	resetPosition(node->next->tetriPiece);
+	
 }
 
 HoldTetri * popHold(HoldTetri *& node)
@@ -55,4 +58,3 @@ HoldTetri * popHold(HoldTetri *& node)
 	return save;
 	
 }
-

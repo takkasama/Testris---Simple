@@ -21,7 +21,7 @@ const float BUTTON_3_X = 377.0f;
 const float BUTTON_4_X = 489.0f;
 
 
-const float KEY_DELAY = 0.099f;
+const float KEY_DELAY = 0.1f;
 
 //CONSTANTES DE LOS RECUADROS PARA MOSTRAR SIGUIENTE DE LA FICHA
 const float NEXT_X = 510.0f;

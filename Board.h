@@ -2,98 +2,7 @@
 #include "HistoricalPiece.h"
 #include "Bag.h"
 #include "HoldTetri.h"
-
-
-
-// PARA ALMACENAR UNA PIEZA Y REPRESENTAR UN ESPACIO DE COLUMNA
-struct Cell
-{
-	// SE DEJA EL TIPO UNICAMENTE DEBIDO A QUE UNA CELDA NO DEBE CONTENER LA PIEZA COMPLETA
-	// DE MODO QUE LA RESPONSABILIDAD DE MANEJO DE POCIONES Y EL HISTORIAL DE ESTE SE ENCARGAR LA
-	// LISTA DE REPRODUCCION
-	char type;
-
-	// INDICADOR DE SI CELDA ESTA SELECIONADAS
-	bool isSelected;
-};
-Cell buildCell()
-{
-	Cell cell;
-	cell.type = 'D';
-	cell.isSelected = false;
-
-	return cell;
-}
-
-void updateCell(Cell &cell, char type, bool isSelected)
-{
-	cell.isSelected = isSelected;
-	cell.type = type;
-}
-
-
-void cleanCell(Cell &cell)
-{
-	cell.isSelected = false;
-	cell.type = 'D';
-}
-
-// LISTA DOBLEMENTE ENLAZADA REQUERIDA PARA LA CONSTRUCCION DEL TABLERO
-struct Row
-{
-	const static int MAX_COLUMNS = 10;
-	Cell cell[MAX_COLUMNS];
-
-	Row *next, *prev;
-};
-
-bool isEmptyRow(Row *row) { return row == nullptr; }
-
-Row *buildRow()
-{
-
-	Row *row = new Row;
-	row->next = nullptr;
-	row->prev = nullptr;
-
-	for (int i = 0; i < row->MAX_COLUMNS; i++)
-		row->cell[i] = buildCell();
-
-	return row;
-}
-bool isSelectedCell(Row *row, int posX)
-{
-	if (isEmptyRow(row))
-		return false;
-
-	return row->cell[posX].isSelected;
-}
-
-bool isFillRow(Row *row)
-{
-	for(int i = 0 ; i < Row::MAX_COLUMNS ; i++)
-		if(!row->cell[i].isSelected)
-		return false;
-	
-	return true;
-}
-
-void addRow(Row *&top, Row *&botton, Row *newRow)
-{
-	if (isEmptyRow(top))
-	{
-		top = newRow;
-		botton = newRow;
-		return;
-	}
-
-	newRow->next = top;
-	top->prev = newRow;
-	top = newRow;
-}
-
-
-
+#include "Row.h"
 
 // ORGANIZACION DE LAS FILAS ADEMAS DE ACCESO A LA PARTE INFERIOR PARA LA LECTURA DE LA VERFICACIONES DE ESTADO DE LAS FILAS
 //ELEMENTO CENTRAL DE LA LOGICA DE JUEGO	
@@ -102,15 +11,12 @@ struct Board
 	const static int MAX_ROWS = 20;	
 	
 	QueueBag * queueBag;
-	
-	
 	HoldTetri * hold;
 	
-	//no se puede intercambiar si el tipo anterior es igual al nuevo
 	TetriPiece currentPiece;
 	
-	bool isActiveCurrentPiece;
 	HistoricalPiece * historical;
+	HistoricalPiece * currentHistorical;
 	
 	Row *top, *bottom;
 };
@@ -122,18 +28,15 @@ Board buildBoard()
 	board.bottom = nullptr;
 	
 	
-	//SE CAMBIA EL VALOR UNA VEZ EMPIEZA EL JUEGO
-	//ESTO SERVIRA PARA LLEVAR EL CONTROL DE LA PIEZA ACTUAL
-	board.isActiveCurrentPiece = false;
-	
 	//GESTORES DE PIEZAS
 	board.queueBag =  buildQueueBag();
 	board.hold = buildHoldTetri();
 	
-	board.historical = nullptr;
 	board.currentPiece = getNextPiece(board.queueBag);
 	
 	
+	board.historical = nullptr;
+	board.currentHistorical = nullptr;
 	
 	for (int i = 0; i < board.MAX_ROWS; i++)
 		addRow(board.top, board.bottom, buildRow());
@@ -146,13 +49,13 @@ void cleanRow(Board & board , Row *&row)
 	if(row->next != nullptr)
 		row->next->prev = row->prev;
 	else 
-		board.top = row->prev;
+		board.bottom = row->prev;
 	
 	
 	if(row->prev != nullptr)
 		row->prev->next = row->next;
 	else 
-		board.bottom = row->next;
+		board.top = row->next;
 	
 	row->next = nullptr;
 	row->prev = nullptr;
@@ -160,10 +63,7 @@ void cleanRow(Board & board , Row *&row)
 	delete row;
 		Row * newRow = buildRow();
 
-	newRow->next = board.top;
-	board.top->prev = newRow;
-	
-	board.top = newRow;
+	addRow(board.top , board.bottom , newRow);
 	
 }
 
@@ -200,25 +100,26 @@ bool isUsedCell(Board & board, int x , int y)
 int getFullRows(Board & board)
 {
 	
-	Row * current = board.bottom;
+	Row *current = board.bottom;
 	
 	int sumFullRows = 0;
-	while(current->prev != nullptr){
-		
-		//POR SI SE LLEGA A ELIMNIAR UNA FILA GUARDAR EL PREVIO DE ESTE
-		Row * prev = current->prev;
+	
+	while(current != nullptr)
+	{
+		Row *prev = current->prev;
 		
 		if(isFillRow(current)){
 			cleanRow(board, current);
 			sumFullRows++;
 		}
+		
 		current = prev;
 	}
 	
-	
 	return sumFullRows;
-	//calculo de los puntos er relacion a las filas elimanas en un movimiento 
 }
+	
+	
 	
 //SE USARA POR CADA CICLO DE JUEGO PARA ACTUALIZAR LA POS DE LAS PIEZAS
 bool canMoveDown(Board & board)
@@ -337,6 +238,7 @@ void updateBoard(Board & board)
 {
 	if(canMoveDown(board)){
 		movePieceDown(board.currentPiece);
+		
 		addHistoric(board.historical , board.currentPiece);		
 		return;
 	}
@@ -344,7 +246,6 @@ void updateBoard(Board & board)
 	lockCurrentPiece(board);
 
 	getFullRows(board);
-	
 	
 	loadNextPiece(board);
 
@@ -381,10 +282,6 @@ void rotate(Board & board)
 	
 	addHistoric(board.historical , board.currentPiece);
 }
-
-
-
-
 	
 void moveToBottom(Board & board)
 {
@@ -397,9 +294,28 @@ void moveToBottom(Board & board)
 }
 
 	
+void goToNext(Board & board)
+{
+	if(board.currentHistorical == nullptr || board.currentHistorical->prev == nullptr)
+		board.currentHistorical = getLastHistoric(board.historical);
 	
 	
+	if(moveToPrevHistorial(board.currentHistorical))
+	{
+		board.currentPiece = board.currentHistorical->tetriPiece;
+	}
+	
+}
+	
+void goToPrev(Board & board)
+{
+	if(board.currentHistorical == nullptr)
+		board.currentHistorical = getLastHistoric(board.historical);
 	
 	
+	if(moveToNextHistorical(board.currentHistorical))
+	{
+		board.currentPiece = board.currentHistorical->tetriPiece;
+	}
 	
-	
+}

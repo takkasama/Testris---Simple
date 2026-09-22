@@ -2,6 +2,9 @@
 #include "Board.h"
 #include "GameGraphic.h"
 #include "Level.h"
+#include "Player.h"
+
+
 
 // CONECCION ENTRE BOARD Y LAS TEXTURAS
 struct Game
@@ -12,7 +15,7 @@ struct Game
 	GameGraphic graphic;
 	
 	// PARA EL MANEJO DE LAS PERSITENCIA LOCAL EL GUARDADO DE PUNTOS POR JUEGADOR
-	// Player player;
+	Player player;
 };
 
 
@@ -22,7 +25,7 @@ Game builGame()
 	game.board = buildBoard();
 	game.level = buildLevel();
 	game.graphic = buildGameGraphic();
-
+	game.player = buildPlayer();
 
 	return game;
 }
@@ -71,10 +74,10 @@ void movePieces(Game & game, bool left , bool right ,
 void validateButtons(Game & game)
 {
 	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_1_X , BUTTON_Y) , "back"))
-		moveToBottom(game.board);
+		goToPrev(game.board);
 
 	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_2_X , BUTTON_Y) , "advance"))
-		moveToBottom(game.board);
+		goToNext(game.board);
 
 }
 
