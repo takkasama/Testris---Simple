@@ -2,6 +2,9 @@
 #include "HistoricalPiece.h"
 #include "Bag.h"
 #include "HoldTetri.h"
+
+
+
 // PARA ALMACENAR UNA PIEZA Y REPRESENTAR UN ESPACIO DE COLUMNA
 struct Cell
 {
@@ -66,16 +69,13 @@ bool isSelectedCell(Row *row, int posX)
 	return row->cell[posX].isSelected;
 }
 
-bool isFillRow(Row *row, int pos)
+bool isFillRow(Row *row)
 {
-
-	if (isEmptyRow(row))
+	for(int i = 0 ; i < Row::MAX_COLUMNS ; i++)
+		if(!row->cell[i].isSelected)
 		return false;
-
-	if (pos == 0)
-		return true;
 	
-	return row->cell[pos].isSelected && isFillRow(row, 0);
+	return true;
 }
 
 void addRow(Row *&top, Row *&botton, Row *newRow)
@@ -142,22 +142,28 @@ Board buildBoard()
 }
 
 void cleanRow(Board & board , Row *&row)
-{
-	if (!isFillRow(row, 0))
-		return;
+{		
+	if(row->next != nullptr)
+		row->next->prev = row->prev;
+	else 
+		board.top = row->prev;
 	
-	Row * save  = row;
-	if(save->next != nullptr)
-		save ->next->prev = save->prev;
-	if(save->prev != nullptr)
-		save ->prev->next = save->next;
 	
-	delete save;
+	if(row->prev != nullptr)
+		row->prev->next = row->next;
+	else 
+		board.bottom = row->next;
 	
-	Row * newRow = buildRow();
+	row->next = nullptr;
+	row->prev = nullptr;
+	
+	delete row;
+		Row * newRow = buildRow();
+
 	newRow->next = board.top;
-	board.top = newRow;
+	board.top->prev = newRow;
 	
+	board.top = newRow;
 	
 }
 
@@ -202,7 +208,7 @@ int getFullRows(Board & board)
 		//POR SI SE LLEGA A ELIMNIAR UNA FILA GUARDAR EL PREVIO DE ESTE
 		Row * prev = current->prev;
 		
-		if(isFillRow(current, 0)){
+		if(isFillRow(current)){
 			cleanRow(board, current);
 			sumFullRows++;
 		}
@@ -311,9 +317,19 @@ void loadNextPiece(Board & board)
 
 void holdPiece(Board & board)
 {
+	bool isValid = board.hold->lastPiece != board.currentPiece.type;
+
+	if(isValid){
+		
+		HoldTetri *  save = popHold(board.hold);
+		
+		pushHold(board.hold , board.currentPiece);
+		
+		board.currentPiece = save != nullptr ? save->tetriPiece : getNextPiece(board.queueBag);
+		
+		return;
+	}
 	
-	pushHold(board.hold, board.currentPiece);
-	loadNextPiece(board);
 }
 
 
