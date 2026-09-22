@@ -1,5 +1,28 @@
 #include "Game.h"
 
+struct Player 
+{
+	string alias;
+	int points;
+	int maxRecord;
+};
+
+Player buildPlayer()
+{
+	Player player;
+	player.alias = "NONE";
+	player.points = 0;
+	player.maxRecord = 0;
+	
+	return player;
+}
+
+
+
+
+
+
+
 
 int main()
 {
@@ -15,12 +38,12 @@ int main()
 		updateGame(game, deltaTime);
 		
 		movePieces(game , 
-				   IsKeyDown(KEY_LEFT) , IsKeyDown(KEY_RIGHT),
+				   IsKeyDown(KEY_J) , IsKeyDown(KEY_L),
 				   IsKeyDown(KEY_R), IsKeyDown(KEY_SPACE),
+				   IsKeyDown(KEY_F),
 				   deltaTime);
 		
-		
-		
+		validateButtons(game);
 		
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
@@ -30,7 +53,7 @@ int main()
 		drawLastRow(game);
 		drawCurrentPiece(game);
 		drawNextPieces(game);
-		
+		drawHoldPiece(game);
 
 		EndDrawing();
 	}
@@ -39,16 +62,4 @@ int main()
 }
 
 
-//for(int y = 0; y < Board::MAX_ROWS; y++)
-//{
-//	Position pos = getTexturePosition(0, y);
-//	
-//	DrawText(
-//			 TextFormat("%d", y),
-//			 (int)pos.x,
-//			 (int)pos.y,
-//			 14,
-//			 RED
-//			 );
-//}
 

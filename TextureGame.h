@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include "raygui.h"
 #include "raylib.h"
 #include "raymath.h" 
@@ -131,17 +130,14 @@ void cleanTextures(TextureGame *& texture)
 }
 
 
-bool drawTexture(TextureGame *& texture , string nameImg , Position position)
+void drawTexture(TextureGame *& texture , string nameImg , Position position)
 {
 	TextureGame * aux  = getTexture(texture , nameImg);
 	
 	if(aux == nullptr)
-		return false;
+		return;
 	
 	DrawTexture(aux->texture , position.x , position.y , WHITE);
-	
-	return true;
-	
 }
 
 
