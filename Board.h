@@ -6,10 +6,13 @@
 
 // ORGANIZACION DE LAS FILAS ADEMAS DE ACCESO A LA PARTE INFERIOR PARA LA LECTURA DE LA VERFICACIONES DE ESTADO DE LAS FILAS
 //ELEMENTO CENTRAL DE LA LOGICA DE JUEGO	
+
+
+
 struct Board
 {
 	const static int MAX_ROWS = 20;	
-	
+		
 	QueueBag * queueBag;
 	HoldTetri * hold;
 	
@@ -33,8 +36,7 @@ Board buildBoard()
 	board.hold = buildHoldTetri();
 	
 	board.currentPiece = getNextPiece(board.queueBag);
-	
-	
+		
 	board.historical = nullptr;
 	board.currentHistorical = nullptr;
 	
@@ -204,23 +206,72 @@ void lockCurrentPiece(Board & board)
 	
 }
 
+//CUANDO SE RETROCEDE UN PASO SE HABILITARA UN TIEMPO DE ESPERA PARA AVANZAR Y RETROCEDER EN ESE TIEMPO SI NO SE ENCUENTRA EN LA PARTE FINAL DE LA
+//LISTA SE BORRARA TODOS LOS ELEMENTOS SIGUIENTES DEL HISTORICO 
+
+
+void goToNext(Board & board)
+{
+	if(board.currentHistorical == nullptr){
+		board.currentHistorical = getLastHistoric(board.historical);
+		return;
+	}
+	
+	if(moveToNextHistorical(board.currentHistorical))
+		board.currentPiece = board.currentHistorical->tetriPiece;
+}
+	
+void goToPrev(Board & board)
+{
+	if(board.currentHistorical == nullptr)
+		board.currentHistorical = getLastHistoric(board.historical);
+	
+	if(moveToPrevHistorial(board.currentHistorical))
+		board.currentPiece = board.currentHistorical->tetriPiece;
+}
+
+
+
+//METODO DE ACTUALIZACION DE LA LISTA REPRODUCCION 
+//LA FUNCION DE ESTA ES SIMPLE, SI EL currentHistorical ES NULO SE ASUME QUE NO ESTA REPRODUCIENDO
+//SI NO ES NULO Y SE ASUME QUE SE VA A MODIFICAR LA LISTA DADO QUE SE HIZO UN MOVIMIENTO AJENO A historical
+//POR LO QUE SE ELIMINAR TODO LOS ELEMENTOS DE LAS LISTA DESPUES DEL ACTUAL
+
+//EL METODO SE LLAMARA POR CADA MODIFICACION DE LA LOCALIZACION DE LA PIEZA DE MODO QUE 
+//QUE SE COLOCARA ANTES DE HACER EL MOVIENTO , PARA LUEGO HACER EL MOVIMIENTO Y COLOCARLO EN EL HISTORIAL MODIFICADO
+void updateHistorial(Board & board)
+{	
+	if(board.currentHistorical == nullptr)
+		return;
+		
+	if(equalPosToSize(board.historical, board.currentHistorical)){
+		board.currentHistorical = nullptr;
+		return;
+	}
+	
+	removeHistoricalFrom(board.historical , board.currentHistorical->pos);
+	board.currentHistorical = nullptr;
+}
+
+
 void loadNextPiece(Board & board)
 {
 	TetriPiece nextPiece = getNextPiece(board.queueBag);
 	
-	addHistoric(board.historical , board.currentPiece);
 	addHistoric(board.historical , nextPiece); 
 	
 	board.currentPiece = nextPiece;
-
+	
 }
 
 
 void holdPiece(Board & board)
 {
 	bool isValid = board.hold->lastPiece != board.currentPiece.type;
-
+	
 	if(isValid){
+		
+		updateHistorial(board);
 		
 		HoldTetri *  save = popHold(board.hold);
 		
@@ -228,47 +279,33 @@ void holdPiece(Board & board)
 		
 		board.currentPiece = save != nullptr ? save->tetriPiece : getNextPiece(board.queueBag);
 		
-		return;
-	}
-	
-}
-
-
-void updateBoard(Board & board)
-{
-	if(canMoveDown(board)){
-		movePieceDown(board.currentPiece);
+		addHistoric(board.historical , board.currentPiece);
 		
-		addHistoric(board.historical , board.currentPiece);		
 		return;
 	}
 	
-	lockCurrentPiece(board);
-
-	getFullRows(board);
-	
-	loadNextPiece(board);
-
-	
 }
+
 void moveRight(Board & board)
 {
 	if(!canMoveRight(board))
 		return;
-
-	movePieceRight(board.currentPiece);
 	
+	updateHistorial(board);
+	
+	movePieceRight(board.currentPiece);
 	
 	addHistoric(board.historical , board.currentPiece);
 }
-	
+
 void moveLeft(Board & board)
 {
 	if(!canMoveLeft(board))
 		return;
 	
-	movePieceLeft(board.currentPiece);
+	updateHistorial(board);
 	
+	movePieceLeft(board.currentPiece);
 	
 	addHistoric(board.historical , board.currentPiece);
 }
@@ -278,44 +315,49 @@ void rotate(Board & board)
 	if(!canRotate(board))
 		return;
 	
+	updateHistorial(board);
+	
 	rotatePiece(board.currentPiece);
 	
 	addHistoric(board.historical , board.currentPiece);
 }
-	
-void moveToBottom(Board & board)
+
+void moveDown(Board & board)
 {
-	while(canMoveDown(board)){
-		for(int i = 0; i < TetriPiece::SIZE; i++)
-			board.currentPiece.pieces[i].y++;
-	}
-		
-	updateBoard(board);
+	if(!canMoveDown(board))
+		return;
+	
+	updateHistorial(board);
+	
+	movePieceDown(board.currentPiece);
+	
+	addHistoric(board.historical , board.currentPiece);
 }
 
-	
-void goToNext(Board & board)
+
+void updateBoard(Board & board)
 {
-	if(board.currentHistorical == nullptr || board.currentHistorical->prev == nullptr)
-		board.currentHistorical = getLastHistoric(board.historical);
 	
-	
-	if(moveToPrevHistorial(board.currentHistorical))
-	{
-		board.currentPiece = board.currentHistorical->tetriPiece;
+	if(canMoveDown(board)){
+		moveDown(board);
+		return;
 	}
+	
+	lockCurrentPiece(board);
+	
+	getFullRows(board);
+	
+	loadNextPiece(board);
+	
 	
 }
-	
-void goToPrev(Board & board)
+
+//COLOCA LA PIEZA EN LA PARTE BAJA SI NO SE DESEA ESPERAR A QUE BASE EN EL CICLO NORMAL
+void moveToBottom(Board & board)
 {
-	if(board.currentHistorical == nullptr)
-		board.currentHistorical = getLastHistoric(board.historical);
 	
+	while(canMoveDown(board))
+		moveDown(board);
 	
-	if(moveToNextHistorical(board.currentHistorical))
-	{
-		board.currentPiece = board.currentHistorical->tetriPiece;
-	}
 	
 }

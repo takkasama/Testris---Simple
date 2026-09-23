@@ -5,6 +5,13 @@ struct HistoricalPiece
 {
 	TetriPiece tetriPiece;
 	
+	
+	//indicador de la pocicion del nodo a lo largo de la lisa
+	//se hace con el objetivo para recortar la lista en el caso de que se necesite modificar un desde - hasta 
+	int pos;
+
+	
+	//manejo del tamanno total de la lista;
 	int size;
 	
 	HistoricalPiece * next , * prev;
@@ -18,12 +25,21 @@ HistoricalPiece * buildHistoric()
 	historic->next = nullptr;
 	historic->prev = nullptr;
 	
+	historic->pos = 0;
 	historic->size = 0;
-	
 	return historic;
 }
 
 bool isEmptyHistorical(HistoricalPiece * historic){ return historic == nullptr; }	
+
+bool equalPosToSize(HistoricalPiece * historicSize , HistoricalPiece * historicPos)
+{
+	if(historicSize == nullptr || historicPos == nullptr)
+		return false;
+	
+	return historicSize->size - 1 == historicPos->pos;
+	
+}
 
 	
 bool moveToNextHistorical(HistoricalPiece *& current){ 
@@ -51,17 +67,19 @@ void addHistoric(HistoricalPiece *& historic ,TetriPiece tetripiece){
 	
 	if(isEmptyHistorical(historic)){		
 		historic = newHistoric;
-		historic->size++;
+		historic->size = 1;
 		return;
 	}
 	
 	HistoricalPiece * current = historic;
 	
-	while(current->next != nullptr)
-		moveToNextHistorical(current);
+	while(moveToNextHistorical(current));
 	
 	newHistoric->prev = current;
 	current->next = newHistoric;
+	
+	//ASIGNACION DE POSICION Y AUMENTO DE TAMANNO;
+	newHistoric->pos = historic->size;
 	historic->size++;
 }
 	
@@ -74,57 +92,62 @@ HistoricalPiece * getLastHistoric(HistoricalPiece * historic)
 	
 	HistoricalPiece * current  = historic;
 	
-	while(current->next != nullptr)
-		current = current->next;
-	
-	
+	while(moveToNextHistorical(current));	
 	
 	return current;
 }	
 	
 
-TetriPiece  removeLastHistoric(HistoricalPiece *& historic){
-	
-	if(isEmptyHistorical(historic))
-		return buildDefault();
-	
-	
-	HistoricalPiece * saveToRemove = historic;
-	TetriPiece save  = historic->tetriPiece;
-	
-	historic = historic->next;
-	historic->prev = nullptr;
-	saveToRemove->next = nullptr;
-	
-	delete saveToRemove;
-	
-	return save;
-	
-}
-	
-
-TetriPiece getHistoricalPiece(HistoricalPiece *& historic, char type)
+HistoricalPiece * getHistoricalPiece(HistoricalPiece *& historic, int pos)
 {
-	if(!isEmptyHistorical(historic))
-		return buildDefault();
+	if(isEmptyHistorical(historic) || pos < 0 || pos > historic->size)
+		return nullptr;
 	
-	if(historic->tetriPiece.type == type)
-		return historic->tetriPiece;
+	if(historic->pos == pos)
+		return historic;
 	
 	HistoricalPiece * current = historic;
 	
-	while(!isEmptyHistorical(current->next) && current->next->tetriPiece.type != type)
-		moveToNextHistorical(current);
+	while(moveToNextHistorical(current)){
+		if(current->pos == pos)
+			return current;
+	}
 	
-	if(isEmptyHistorical(current->next) || current->next->tetriPiece.type != type)
-		return buildDefault();
-	
-	return current->next->tetriPiece;
-	
+	return nullptr;
 }
 
 
+void removeHistoricalFrom(HistoricalPiece *& historic , int pos)
+{
+	if(historic == nullptr)
+		return;
+		
 	
+	
+	//GUARDO LA POSICION DEL NODO PREVIO A LOS QUE SE VAN A ELIMINAR
+	HistoricalPiece * save = getHistoricalPiece(historic , pos);
+
+	if(save == nullptr) return;
+	
+	//ELEMENTO A ELIMINAR
+	HistoricalPiece * current = save->next;
+	
+	//EVITAMOS QUE EL ULTIMO NODO ANTES DE BORRAR APUNTE A NADA
+	save->next = nullptr;
+	
+	while(current->next != nullptr){
+		
+		HistoricalPiece * next = current->next;
+	
+		delete current;
+		
+		current = next; 
+	}
+	
+	//CORREGIMOS EL SIZE GENERAL
+	historic->size = pos + 1;
+	
+}	
 	
 
 
