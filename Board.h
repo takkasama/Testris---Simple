@@ -337,7 +337,6 @@ void moveDown(Board & board)
 
 void updateBoard(Board & board)
 {
-	
 	if(canMoveDown(board)){
 		moveDown(board);
 		return;
@@ -348,16 +347,27 @@ void updateBoard(Board & board)
 	getFullRows(board);
 	
 	loadNextPiece(board);
-	
-	
+		
 }
 
 //COLOCA LA PIEZA EN LA PARTE BAJA SI NO SE DESEA ESPERAR A QUE BASE EN EL CICLO NORMAL
 void moveToBottom(Board & board)
-{
-	
+{	
 	while(canMoveDown(board))
 		moveDown(board);
 	
-	
 }
+
+void cleanCellsToHistorical(Board & board)
+{
+	for(int i = 0 ; i < TetriPiece::SIZE ; i++){
+		Piece piece = board.currentPiece.pieces[i];
+		Row * row = getRow(board, piece.y);
+		
+		if(row->cell[piece.x].isSelected)
+			row->cell[piece.x].isSelected = false;
+	}
+}
+
+
+

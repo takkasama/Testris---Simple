@@ -26,18 +26,20 @@ struct State
 //FORMA DE ABREVIAR PARAMETROS DE LAS KEY USADAS PARA EL JUGO
 struct KeyPressed
 {
+	const static int ANY = -1;
+	
 	const static int KEY_L = 0; //DERECHA
 	const static int KEY_K = 1; //ROTAR
 	const static int KEY_J = 2; //IZQUIERDA
 	const static int KEY_H = 3; //MANTENER PIEZA
 	
-	const static int KEY_RIGHT = 4; //AVANZAR
-	const static int KEY_LEFT = 5;  //RETROCEDER
+	const static int KEY_O = 4; //AVANZAR
+	const static int KEY_U = 5;  //RETROCEDER
 	
 	const static int KEY_ESCAPE = 6; //PAUSA
 	const static int KEY_SPACE = 7; //MOVER HASTA ABAJO UNA PIEZA
 	
-	int currentKey; // ACTUAL PRESIONADO
+	int currentKey = ANY; // ACTUAL PRESIONADO
 	
 };
 
@@ -71,51 +73,8 @@ Game builGame()
 
 
 
-void updateGame(Game &game, float time)
-{
 
-	if(game.state.currentState == State::PLAY){
-		game.graphic.updateTimer += time;
-		
-		if (game.graphic.updateTimer >= game.level.speed)
-		{
-			
-			game.graphic.updateTimer -= game.level.speed;
-			updateBoard(game.board);
-			updateLevel(game.level, getFullRows(game.board));
-			
-		}
-		
-		return;
-	}
-	if(game.state.currentState == State::PAUSE){
-
-		
-		
-		return;
-	}
-	if(game.state.currentState == State::REPRODUCE){
-		game.graphic.updateTimer += time;
-		
-		if(game.graphic.updateTimer >= 4.0f){
-			game.state.currentState = State::PLAY;
-			game.board.currentHistorical = getLastHistoric(game.board.historical);
-		}
-		
-		return;
-	}
-	if(game.state.currentState == State::MENU){
-		
-		
-		
-		
-		return;
-	}
-	
-	
-}
-
-void verifyKeys(Game & game, KeyPressed key ,float time)
+void verifyKeys(Game & game, KeyPressed & key ,float time)
 {
 	game.graphic.keyTimer += time;
 	
@@ -123,30 +82,45 @@ void verifyKeys(Game & game, KeyPressed key ,float time)
 	{
 		game.graphic.keyTimer = 0.0f;
 		
+		if(key.currentKey == KeyPressed::ANY)
+			return;
+		
 		switch(key.currentKey){
-			case KeyPressed::KEY_J:
-				moveRight(game.board);
-				break;
 			case KeyPressed::KEY_L:
+				moveRight(game.board);
+				key.currentKey = KeyPressed::ANY;
+				break;
+			case KeyPressed::KEY_J:
 				moveLeft(game.board);
+				key.currentKey = KeyPressed::ANY;
 				break;
 			case KeyPressed::KEY_K:
 				rotate(game.board);
+				key.currentKey = KeyPressed::ANY;
 				break;
 			case KeyPressed::KEY_H:
 				holdPiece(game.board);
+				key.currentKey = KeyPressed::ANY;
 				break;
 			case KeyPressed::KEY_SPACE:
 				moveToBottom(game.board);
+				key.currentKey = KeyPressed::ANY;
 				break;
 			case KeyPressed::KEY_ESCAPE:
 				game.state.currentState = State::PAUSE;
+				key.currentKey = KeyPressed::ANY;
 				break;
-			case KeyPressed::KEY_LEFT:
+			case KeyPressed::KEY_U:
+				goToPrev(game.board);
+				game.graphic.updateTimer = 0.0f;
 				game.state.currentState = State::REPRODUCE;
+				key.currentKey = KeyPressed::ANY;
 				break;
-			case KeyPressed::KEY_RIGHT:
+			case KeyPressed::KEY_O:
+				goToNext(game.board);
+				game.graphic.updateTimer = 0.0f;
 				game.state.currentState = State::REPRODUCE;
+				key.currentKey = KeyPressed::ANY;
 				break;	
 		}
 		
@@ -158,30 +132,66 @@ void verifyButtons(Game & game)
 {
 	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_1_X , BUTTON_Y) , "back")){
 		goToPrev(game.board);
+		game.graphic.updateTimer = 0.0f;
 		game.state.currentState = State::REPRODUCE;
 		return;
 	}
 	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_2_X , BUTTON_Y) , "advance")){
 		goToNext(game.board);
+		game.graphic.updateTimer = 0.0f;
 		game.state.currentState = State::REPRODUCE;
 		return;
 	}
-	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_3_X , BUTTON_Y) , "pause")){
-		
+	if(isPressTexture( game.graphic.textures , buildPosition(BUTTON_3_X , BUTTON_Y) , "pause")){		
 		game.state.currentState =State::PAUSE;
-		//pause game
 		return;
 	}
-	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_4_X , BUTTON_Y) , "exit")){
-		
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_4_X , BUTTON_Y) , "exit")){		
 		game.state.currentState = State::MENU;
-		//go to menu
 		return;
 	}
 
 }
 
-
+void updateGame(Game &game, KeyPressed & key ,float time)
+{
+	
+	verifyKeys(game , key , time);
+	verifyButtons(game);
+	
+	if(game.state.currentState == State::PLAY){
+		game.graphic.updateTimer += time;
+		
+		if (game.graphic.updateTimer >= game.level.speed)
+		{
+			game.graphic.updateTimer -= game.level.speed;
+			updateBoard(game.board);
+			updateLevel(game.level, getFullRows(game.board));
+			
+		}
+		return;
+	}
+	if(game.state.currentState == State::PAUSE){
+		
+		
+		//PUASE ACTION
+		return;
+	}
+	if(game.state.currentState == State::REPRODUCE){
+		game.graphic.updateTimer += time;
+		cleanCellsToHistorical(game.board);
+		if(game.graphic.updateTimer >= 4.0f){
+			game.state.currentState = State::PLAY;
+		}
+		return;
+	}
+	if(game.state.currentState == State::MENU){
+		//menu actions
+		return;
+	}
+	
+	
+}
 
 
 

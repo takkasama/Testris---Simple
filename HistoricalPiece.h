@@ -5,12 +5,10 @@ struct HistoricalPiece
 {
 	TetriPiece tetriPiece;
 	
-	
 	//indicador de la pocicion del nodo a lo largo de la lisa
 	//se hace con el objetivo para recortar la lista en el caso de que se necesite modificar un desde - hasta 
 	int pos;
 
-	
 	//manejo del tamanno total de la lista;
 	int size;
 	
