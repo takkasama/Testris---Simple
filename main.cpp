@@ -9,7 +9,22 @@ int main()
 	srand(time(nullptr));	
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_TOPMOST | FLAG_WINDOW_TRANSPARENT);
 
+	Player playerTest;
+	playerTest.name = "TAKKASAM";
+	playerTest.record = 3001;
+
 	
+	Player playerTest1;
+	playerTest1.name = "kuno";
+	playerTest1.record = 31;
+	
+	Player playerTest2;
+	playerTest2.name = "TAKKA";
+	playerTest2.record = 4010;
+	
+	writePlayerToFile(playerTest);
+	writePlayerToFile(playerTest1);
+	writePlayerToFile(playerTest2);
 	
 	
 	const static int WIDTH = 710;

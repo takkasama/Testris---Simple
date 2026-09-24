@@ -1,0 +1,2 @@
+<player><name>kuno</name><record>31</record></player><player><name>TAKKASAM</name><record>3001</record></player><player><name>TAKKA</name><record>401</record></player>
+<player><name>TAKKA</name><record>4010</record></player>
