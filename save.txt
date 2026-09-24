@@ -1,2 +1,7 @@
-<player><name>kuno</name><record>31</record></player><player><name>TAKKASAM</name><record>3001</record></player><player><name>TAKKA</name><record>401</record></player>
-<player><name>TAKKA</name><record>4010</record></player>
+<player><name>Takkasama</name><record>31</record></player>
+<player><name>Takkasama1</name><record>30</record></player>
+<player><name>Takkasama2</name><record>20</record></player>
+<player><name>Takkasama4</name><record>301</record></player>
+<player><name>Takkasama3</name><record>11</record></player>
+<player><name>Takkasama5</name><record>400</record></player>
+<player><name>Takkasama6</name><record>0</record></player>
