@@ -1,5 +1,4 @@
-#include "Game.h"
-
+#include "Game/Game.h"
 
 
 
@@ -8,35 +7,38 @@
 int main()
 {
 	srand(time(nullptr));	
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_TOPMOST | FLAG_WINDOW_TRANSPARENT);
+
 	
-	InitWindow(710, 990, "TETRIS");
+	
+	
+	const static int WIDTH = 710;
+	const static int HEIGHT = 990;
+	
+	
+	InitWindow(WIDTH, HEIGHT, "TETRIS");
+	SetTargetFPS(60);
 	
 	Game game = builGame();
-	
+	KeyPressed key;
 	while (!WindowShouldClose()) {
-		float deltaTime = GetFrameTime();
+		float time = GetFrameTime();
 		
-		updateGame(game, deltaTime);
+		if(IsKeyDown(KEY_J)) key.currentKey = KeyPressed::KEY_J;
+		else if(IsKeyDown(KEY_L)) key.currentKey = KeyPressed::KEY_L;
+		else if(IsKeyDown(KEY_K)) key.currentKey = KeyPressed::KEY_K;
+		else if(IsKeyDown(KEY_H)) key.currentKey = KeyPressed::KEY_H;
+		else if(IsKeyDown(KEY_SPACE)) key.currentKey = KeyPressed::KEY_SPACE;
+		else if(IsKeyDown(KEY_O)) key.currentKey = KeyPressed::KEY_O;
+		else if(IsKeyDown(KEY_U)) key.currentKey = KeyPressed::KEY_U;
 		
-		movePieces(game , 
-				   IsKeyDown(KEY_J) , IsKeyDown(KEY_L),
-				   IsKeyDown(KEY_K), IsKeyDown(KEY_SPACE),
-				   IsKeyDown(KEY_F),
-				   deltaTime);
 		
-		validateButtons(game);
-		
+		updateGame(game, key , time);
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
-		drawBackground(game);
-		drawButtonsBoard(game);
-		drawPiecesTextures(game);
-		drawLastRow(game);
-		drawCurrentPiece(game);
-		drawNextPieces(game);
-		drawHoldPiece(game);
-
+		drawGame(game);
 		EndDrawing();
+		
 	}
 	
 	return 0;

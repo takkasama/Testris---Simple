@@ -22,7 +22,9 @@ void registerPoints(Player & player , int totalPoints)
 	if(totalPoints > player.maxRecord)
 		player.maxRecord = totalPoints;
 	
+	player.points = 0;	
 }
+
 
 
 //LOGICA DE GUARDADO DE ARCHIVOS Y OBTENCINO DE LOS OTROS REGISTROS

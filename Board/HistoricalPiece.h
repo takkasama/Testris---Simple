@@ -1,5 +1,5 @@
 #pragma once
-#include "TetriPiece.h"
+#include "../Board/TetriPiece.h"
 
 struct HistoricalPiece
 {

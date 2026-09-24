@@ -1,5 +1,5 @@
 #pragma once
-#include "Board.h"
+#include "../Board/Board.h"
 #include "GameGraphic.h"
 #include "Level.h"
 #include "Player.h"
@@ -49,11 +49,14 @@ struct KeyPressed
 // CONECCION ENTRE BOARD Y LAS TEXTURAS
 struct Game
 {
+	const static int MAX_PLAYERS = 10;
+	
 	Board board;
 	Level level;
 
 	GameGraphic graphic;
 	
+	Player player[MAX_PLAYERS];
 	State state;
 };
 
@@ -65,7 +68,7 @@ Game builGame()
 	game.board = buildBoard();
 	game.level = buildLevel();
 	game.graphic = buildGameGraphic();
-	
+
 	game.state.currentState = State::PLAY;
 
 	return game;
@@ -192,17 +195,6 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 	
 	
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 //DIBUJO DE JUEGO 
