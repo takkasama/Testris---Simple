@@ -6,10 +6,12 @@
 
 using namespace std;
 
-const string PATH_PIECES = "Assets/Pieces/";
-const string PATH_BUTTONS = "Assets/Background/";	
+const string PATH_PIECES = "resources/Pieces/";
+const string PATH_BUTTONS = "resources/Background/";	
 
-
+const string FONT_7_SEGMENT_PATH = "resources/7_Segment.ttf";
+//DrawRectangleLines(fontPosition.x, fontPosition.y, textSize.x, textSize.y, RED);
+//void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);	
 struct Position
 {
 	float x;
@@ -36,20 +38,22 @@ struct TextureGame
 	
 	Texture2D texture;
 	
+	Font font;
+	
 	TextureGame * next , * prev;
 	
 };
 
-TextureGame * buildTextureGame(string nameImg, bool isTetriTexture)
+TextureGame * buildTextureGame(string nameFile, bool isTetriTexture)
 {
 	TextureGame * texture = new TextureGame;
 	
-	
 	//POR DEFECTO SOLO SE MANEJARA IMAGENES TIPO .png
-	string texturePath = isTetriTexture ? PATH_PIECES + nameImg + ".png" :
-		PATH_BUTTONS + nameImg + ".png";	
-	
+	string texturePath = isTetriTexture ? PATH_PIECES + nameFile + ".png" :
+		PATH_BUTTONS + nameFile + ".png";	
 	texture->texture = LoadTexture(texturePath.c_str());
+	
+	texture->font = LoadFont(FONT_7_SEGMENT_PATH.c_str());
 	
 	texture->x = 0;
 	texture->y = 0;
@@ -57,7 +61,7 @@ TextureGame * buildTextureGame(string nameImg, bool isTetriTexture)
 	texture->next = nullptr;
 	texture->prev = nullptr;
 	
-	texture->name = nameImg;
+	texture->name = nameFile;
 	
 	return texture;
 }
@@ -74,9 +78,9 @@ void updatePositionTextureGame(TextureGame & TextureGame, float x , float y)
 }
 
 
-void addTexture(TextureGame *&texture , string nameImg, bool isTetriTexture)
+void addTexture(TextureGame *&texture , string nameFile, bool isTetriTexture)
 {
-	TextureGame * newTexture = buildTextureGame(nameImg, isTetriTexture);
+	TextureGame * newTexture = buildTextureGame(nameFile, isTetriTexture);
 	if(texture == nullptr){
 		texture = newTexture;
 		return;
@@ -88,21 +92,21 @@ void addTexture(TextureGame *&texture , string nameImg, bool isTetriTexture)
 }
 
 
-TextureGame * getTexture(TextureGame *& texture ,  string nameImg)
+TextureGame * getTexture(TextureGame *& texture ,  string nameFile)
 {
 	if(texture == nullptr)
 		return nullptr;
 	
-	if(texture->name == nameImg)
+	if(texture->name == nameFile)
 		return texture;
 	
 	
 	TextureGame * current = texture;
 	
-	while(current->next != nullptr && current->next->name != nameImg)
+	while(current->next != nullptr && current->next->name != nameFile)
 		current = current->next;
 	
-	if(current->next != nullptr && current->next->name == nameImg)
+	if(current->next != nullptr && current->next->name == nameFile)
 		return current->next;
 	
 	return nullptr;
@@ -131,9 +135,9 @@ void cleanTextures(TextureGame *& texture)
 }
 
 
-void drawTexture(TextureGame *& texture , string nameImg , Position position)
+void drawTexture(TextureGame *& texture , string nameFile , Position position)
 {
-	TextureGame * aux  = getTexture(texture , nameImg);
+	TextureGame * aux  = getTexture(texture , nameFile);
 	
 	if(aux == nullptr)
 		return;
@@ -141,10 +145,20 @@ void drawTexture(TextureGame *& texture , string nameImg , Position position)
 	DrawTexture(aux->texture , position.x , position.y , WHITE);
 }
 
-
-bool isPressTexture(TextureGame *& texture, Position position , string nameImg)
+void dranText(TextureGame *& texture , string text , float fontSize , Position position)
 {	
-	TextureGame * aux = getTexture(texture , nameImg);
+	if(texture == nullptr)
+		return;
+	
+	
+	Vector2 pos = {position.x, position.y};
+	
+	DrawTextEx(texture->font , "texto" , pos ,fontSize , 1.0f , BLACK);
+}
+
+bool isPressTexture(TextureGame *& texture, Position position , string nameFile)
+{	
+	TextureGame * aux = getTexture(texture , nameFile);
 	
 	if(aux == nullptr)
 		return false;

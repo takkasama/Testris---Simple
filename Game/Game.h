@@ -57,6 +57,7 @@ struct Game
 	GameGraphic graphic;
 	
 	Player player[MAX_PLAYERS];
+	
 	State state;
 };
 
