@@ -69,6 +69,19 @@ void addPlayerNode(PlayerNode *& node , Player player)
 	current->next = newNode;
 }
 
+PlayerNode * getLastPlayerNode(PlayerNode *& node)
+{
+	if(node == nullptr) return nullptr;
+	
+	PlayerNode * current = node;
+	
+	while(current->next != nullptr)
+		current = current->next;
+	
+	return current;
+}
+
+
 
 bool openOutFile(ofstream & outFile , bool isToAdd)
 {
@@ -212,7 +225,7 @@ PlayerNode * readPlayersFile()
 	return list;
 }
 
-void sortListByBubleSort(PlayerNode *& node)
+void orderPlayerByBubbleSort(PlayerNode *& node)
 {
 	if(node == nullptr) return;
 	
@@ -253,18 +266,87 @@ void sortListByBubleSort(PlayerNode *& node)
 	
 	
 }
-	
 
 
-void sortListByQuickSort(PlayerNode *& node)
+PlayerNode* createParition(PlayerNode * begin , PlayerNode *& end , PlayerNode *& prevToBegin)
 {
+	//elemento principal 
+	if(begin == nullptr || end == nullptr) return nullptr;
 	
 	
+	//NODO PARA LA CONECCION PARA LA AYUDA DE LA CONEXION DEL ANTERIO Y EL SIGUIENTE A MOVER
+	PlayerNode * current = begin->next;
+	PlayerNode * prevToCurrent = begin;
+
+	//DECLARACION DEL NUEVO COMIENZO QUE SERIA EL CENTRAL DE LA PARTICION
+	PlayerNode * newBegin = begin;
+	
+	while(current != nullptr){
+		if(begin->player.record > current->player.record){
+			//CONEXION DEL ANTERIOR Y EL SIGUIENTE DEL NODO A MOVER
+			PlayerNode * save = current->next;
+			prevToCurrent->next = save;
+			
+			//CONEXION CON EL NODO PIVOTE O PRINCIPAL Y EL ANTERIOR A ESTE SI LO TIENE
+			current->next = begin;
+			
+			//INDICAMO QUE SI NEUBO INICIO SERA EL PRIMER ELEMENTO QUE SE DEBA DE MOVER 
+			//DE ESTE MODO LOGRAMOS CONSERVAR EL INCIO DE LOS ELEMENTOS QUE DEBEMOS ORDENAR
+			if(prevToBegin == nullptr)
+				newBegin = current;
+			else 
+				prevToBegin->next = current;
+			
+			//ACUTALIZACION EL ELEMNTO PREVIO AL PIVOTE;
+			prevToBegin = current;
+			
+			current = save;
+			continue;
+		}
+		
+		prevToCurrent = current;
+		current = current->next;
+	}
+
+	return newBegin;
+}
+
+
+void quickSort(PlayerNode *& begin , PlayerNode *& end)
+{
+	if(begin == nullptr || end == nullptr ||end == begin) return;
+	
+	//INDICAMOS QUE EL NODO INICIAL COMO EL CENTRO DE PARTICION
+	PlayerNode * parition = begin;
 	
 	
+	//ELEMNTO QUE FUNCIONARA COMO EL LEMENTO 
+	PlayerNode * prevToBegin = nullptr;
 	
 	
+	//CREO UN PARTICION ACOMODANDO A LA IZQUIERDA LOR MENORES Y A LA DERECHA LOS MAYORES;
+	//LO QUE SE OBTIENE ES EL INCIO DEL ELEMENTO MAS BAJO A LA IZQUIERDA QUE SERA EL COMIENZO PARA LA PARTE IZQUIERDA
+	//EL NODO OBTENIDO ES EL PRIMER NODO QUE ES IDENTIFICADO COMO 
+	begin = createParition(begin , end, prevToBegin);
 	
+	
+	//IZQUIERDA
+	if(prevToBegin != nullptr)
+		quickSort(begin , prevToBegin);
+	
+	//DERECHA
+	if(parition != end)
+		quickSort(parition->next , end);
+}
+
+
+void orderPlayerByQuickSort(PlayerNode *& node)
+{
+	if(node  ==  nullptr) return;
+	
+	PlayerNode * end = getLastPlayerNode(node);	
+	
+	quickSort(node , end);
 	
 }
 
@@ -280,9 +362,9 @@ void getTopPlayer(Player *& players , int size, bool isQuickSort)
 		return;
 	
 	if(isQuickSort)
-		sortListByQuickSort(listPlayers);
+		orderPlayerByQuickSort(listPlayers);
 	else 
-		sortListByBubleSort(listPlayers);
+		orderPlayerByBubbleSort(listPlayers);
 	
 	PlayerNode * current = listPlayers;
 	
