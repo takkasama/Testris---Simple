@@ -1,28 +1,4 @@
-#pragma once
-#include "HistoricalPiece.h"
-#include "Bag.h"
-#include "HoldTetri.h"
-#include "Row.h"
-
-// ORGANIZACION DE LAS FILAS ADEMAS DE ACCESO A LA PARTE INFERIOR PARA LA LECTURA DE LA VERFICACIONES DE ESTADO DE LAS FILAS
-//ELEMENTO CENTRAL DE LA LOGICA DE JUEGO	
-
-
-
-struct Board
-{
-	const static int MAX_ROWS = 20;	
-		
-	QueueBag * queueBag;
-	HoldTetri * hold;
-	
-	TetriPiece currentPiece;
-	
-	HistoricalPiece * historical;
-	HistoricalPiece * currentHistorical;
-	
-	Row *top, *bottom;
-};
+#include "../header/Board.h"
 
 Board buildBoard()
 {
@@ -33,16 +9,16 @@ Board buildBoard()
 	
 	//GESTORES DE PIEZAS
 	board.queueBag =  buildQueueBag();
-	board.hold = buildHoldTetri();
+	board.hold = buildHold();
 	
 	board.currentPiece = getNextPiece(board.queueBag);
-		
+	
 	board.historical = nullptr;
 	board.currentHistorical = nullptr;
 	
 	for (int i = 0; i < board.MAX_ROWS; i++)
 		addRow(board.top, board.bottom, buildRow());
-
+	
 	return board;
 }
 
@@ -63,8 +39,8 @@ void cleanRow(Board & board , Row *&row)
 	row->prev = nullptr;
 	
 	delete row;
-		Row * newRow = buildRow();
-
+	Row * newRow = buildRow();
+	
 	addRow(board.top , board.bottom , newRow);
 	
 }
@@ -120,9 +96,9 @@ int getFullRows(Board & board)
 	
 	return sumFullRows;
 }
-	
-	
-	
+
+
+
 //SE USARA POR CADA CICLO DE JUEGO PARA ACTUALIZAR LA POS DE LAS PIEZAS
 bool canMoveDown(Board & board)
 {
@@ -153,7 +129,7 @@ bool canMoveRight(Board & board)
 	}
 	return true;
 }
-	
+
 
 
 bool canMoveLeft(Board & board)
@@ -166,18 +142,18 @@ bool canMoveLeft(Board & board)
 		
 		if(isUsedCell(board , x, y))
 			return false;
-			
+		
 	}
 	return  true;
 }	
-	
+
 bool canRotate(Board & board)
 {
 	TetriPiece piece = board.currentPiece;
 	
 	int auxX = piece.pieces[1].x;
 	int auxY = piece.pieces[1].y;
- 	
+	
 	for(int i = 0; i < TetriPiece::SIZE; i++){
 		
 		int x = auxX + (piece.pieces[i].y - auxY);
@@ -218,9 +194,9 @@ void goToNext(Board & board)
 	}
 	
 	if(moveToNextHistorical(board.currentHistorical))
-		board.currentPiece = board.currentHistorical->tetriPiece;
+	   board.currentPiece = board.currentHistorical->tetriPiece;
 }
-	
+
 void goToPrev(Board & board)
 {
 	if(board.currentHistorical == nullptr)
@@ -243,7 +219,7 @@ void updateHistorial(Board & board)
 {	
 	if(board.currentHistorical == nullptr)
 		return;
-		
+	
 	if(equalPosToSize(board.historical, board.currentHistorical)){
 		board.currentHistorical = nullptr;
 		return;
@@ -273,7 +249,7 @@ void holdPiece(Board & board)
 		
 		updateHistorial(board);
 		
-		HoldTetri *  save = popHold(board.hold);
+		Hold *  save = popHold(board.hold);
 		
 		pushHold(board.hold , board.currentPiece);
 		
@@ -335,19 +311,33 @@ void moveDown(Board & board)
 }
 
 
-void updateBoard(Board & board)
+
+//INDICA QUE SI UNA PIEZA QUE ESTA MARCADA SE ENCUENTRA EN EL TOP DEL BOARD
+bool isBoardFull(Board & board)
 {
+	for(int i = 0 ; i < Row::MAX_COLUMNS; i ++)
+		if(board.top->cell[i].isSelected) return true;
+	
+	return false;
+	
+}
+
+bool updateBoard(Board & board)
+{		
 	if(canMoveDown(board)){
 		moveDown(board);
-		return;
+		return true;
 	}
 	
 	lockCurrentPiece(board);
 	
-	getFullRows(board);
+	
+	//PREGUNDO ANTES DE CARGAR LA SIGUIENTE PIEZA SI PUEDE ACTUALIZAR A LA SIGUIENTE.
+	if(isBoardFull(board)) return false;
 	
 	loadNextPiece(board);
-		
+	
+	return true;
 }
 
 //COLOCA LA PIEZA EN LA PARTE BAJA SI NO SE DESEA ESPERAR A QUE BASE EN EL CICLO NORMAL
@@ -368,6 +358,8 @@ void cleanCellsToHistorical(Board & board)
 			row->cell[piece.x].isSelected = false;
 	}
 }
+
+
 
 
 

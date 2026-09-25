@@ -1,48 +1,13 @@
-#pragma once
-#include<string>
-#include "raygui.h"
-#include "raylib.h"
-#include "raymath.h" 
-
-using namespace std;
-
-const string PATH_PIECES = "resources/Pieces/";
-const string PATH_BUTTONS = "resources/Background/";	
-
-const string FONT_7_SEGMENT_PATH = "resources/7_Segment.ttf";
-//DrawRectangleLines(fontPosition.x, fontPosition.y, textSize.x, textSize.y, RED);
-//void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);	
-struct Position
-{
-	float x;
-	float y;
-};
+#include "../header/TextureGame.h"
 
 Position buildPosition(float x , float y)
 {
 	Position position;
 	position.x = x;
 	position.y = y;
-
+	
 	return position;
 }
-
-//ESTRUCTURA QUE MANEJA TODAS LAS TEXTURAS DEL JUEGO 
-struct TextureGame
-{	
-	//identificador para buscar las texturas
-	string name;
-	
-	float x;
-	float y;
-	
-	Texture2D texture;
-	
-	Font font;
-	
-	TextureGame * next , * prev;
-	
-};
 
 TextureGame * buildTextureGame(string nameFile, bool isTetriTexture)
 {
@@ -153,7 +118,7 @@ void dranText(TextureGame *& texture , string text , float fontSize , Position p
 	
 	Vector2 pos = {position.x, position.y};
 	
-	DrawTextEx(texture->font , "texto" , pos ,fontSize , 1.0f , BLACK);
+	DrawTextEx(texture->font , text.c_str() , pos ,fontSize , 1.0f , BLACK);
 }
 
 bool isPressTexture(TextureGame *& texture, Position position , string nameFile)
@@ -167,4 +132,3 @@ bool isPressTexture(TextureGame *& texture, Position position , string nameFile)
 	return IsMouseButtonPressed(MOUSE_BUTTON_LEFT) 
 		&& CheckCollisionPointRec(GetMousePosition(), rectangle);
 }
-

@@ -1,23 +1,6 @@
-#pragma once
+#include "../header/Bag.h"
+
 #include<iostream>
-
-struct Bag
-{
-	const static int MAX_SIZE = 7;
-	const static int WAIT_SIZE = 3;
-	
-	
-	//SE USA PARA PODER MOSTAR LOS SIGUIENTES '3' TETRIS
-	TetriPiece waitPieces[WAIT_SIZE];
-	int currentWaitPiece;
-	
-	TetriPiece tetriPieces[MAX_SIZE];
-	int curentPieces;
-
-	Bag *next;
-};
-
-
 
 bool isEmptyBag(Bag bag) { return bag.curentPieces < 0; }
 
@@ -80,31 +63,24 @@ Bag generateBag()
 	bag.next = nullptr;
 	return bag;
 }
-// ESTA ESTRUCTRA SIRVE PARA LLEVAR EL CONTROL DE LAS BOLSAS DE MODO QUE FUNCIONA COMO UNA COLA
-// Y LLEVA LA COLA ACTUAL ACTUALIZANDO ESTA SI ESTA VACIA, DONDE LA ESTRUCTURA NO SE APUNTO A SU SIGUIENTE
-// SI NO QUE QUE APUNTA LA COLA DE LA BOLSA, SIRVE COMO UN ENVOLTORIO
-struct QueueBag
-{
-	Bag *currentBag;
 
-	Bag *queue, *top;
-};
+
 
 QueueBag * buildQueueBag()
 {
 	QueueBag * queueBag = new QueueBag;
-
+	
 	queueBag->currentBag = new Bag(generateBag());
-
+	
 	queueBag->queue = nullptr;
 	queueBag->top = nullptr;
-
+	
 	return queueBag;
 }
 
 void queueCurrentBag(QueueBag *&node)
 {
-
+	
 	Bag *current = node->currentBag;
 	
 	if (node->top == nullptr)
@@ -115,7 +91,7 @@ void queueCurrentBag(QueueBag *&node)
 		node->currentBag = nullptr;
 		return;
 	}
-
+	
 	node->top->next = current;
 	node->top = current;
 	
@@ -126,15 +102,15 @@ Bag *desqueBag(QueueBag *& node)
 {
 	if (node->queue == nullptr)
 		return nullptr;
-
+	
 	Bag *save = node->queue;
 	node->queue = save->next;
-
+	
 	save->next = nullptr;
-
+	
 	if (node->top == nullptr)
 		return nullptr;
-
+	
 	return save;
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "../Board/TetriPiece.h"
 
-struct HistoricalPiece
+struct Historical
 {
 	TetriPiece tetriPiece;
 	
@@ -12,13 +12,13 @@ struct HistoricalPiece
 	//manejo del tamanno total de la lista;
 	int size;
 	
-	HistoricalPiece * next , * prev;
+	Historical * next , * prev;
 };
 
 
-HistoricalPiece * buildHistoric()
+Historical * buildHistoric()
 {
-	HistoricalPiece * historic = new HistoricalPiece;
+	Historical * historic = new Historical;
 	historic->tetriPiece = buildDefault();
 	historic->next = nullptr;
 	historic->prev = nullptr;
@@ -28,9 +28,9 @@ HistoricalPiece * buildHistoric()
 	return historic;
 }
 
-bool isEmptyHistorical(HistoricalPiece * historic){ return historic == nullptr; }	
+bool isEmptyHistorical(Historical * historic){ return historic == nullptr; }	
 
-bool equalPosToSize(HistoricalPiece * historicSize , HistoricalPiece * historicPos)
+bool equalPosToSize(Historical * historicSize , Historical * historicPos)
 {
 	if(historicSize == nullptr || historicPos == nullptr)
 		return false;
@@ -40,7 +40,7 @@ bool equalPosToSize(HistoricalPiece * historicSize , HistoricalPiece * historicP
 }
 
 	
-bool moveToNextHistorical(HistoricalPiece *& current){ 
+bool moveToNextHistorical(Historical *& current){ 
 	if(current == nullptr || current->next == nullptr) 
 		return false;
 	
@@ -48,7 +48,7 @@ bool moveToNextHistorical(HistoricalPiece *& current){
 	return true;
 }
 	
-bool moveToPrevHistorial(HistoricalPiece *& current){
+bool moveToPrevHistorial(Historical *& current){
 	if(current == nullptr || current->prev == nullptr) 
 		return false;
 	
@@ -59,8 +59,8 @@ bool moveToPrevHistorial(HistoricalPiece *& current){
 	
 	
 	
-void addHistoric(HistoricalPiece *& historic ,TetriPiece tetripiece){
-	HistoricalPiece * newHistoric = buildHistoric();
+void addHistoric(Historical *& historic ,TetriPiece tetripiece){
+	Historical * newHistoric = buildHistoric();
 	newHistoric->tetriPiece = tetripiece;
 	
 	if(isEmptyHistorical(historic)){		
@@ -69,7 +69,7 @@ void addHistoric(HistoricalPiece *& historic ,TetriPiece tetripiece){
 		return;
 	}
 	
-	HistoricalPiece * current = historic;
+	Historical * current = historic;
 	
 	while(moveToNextHistorical(current));
 	
@@ -82,13 +82,13 @@ void addHistoric(HistoricalPiece *& historic ,TetriPiece tetripiece){
 }
 	
 	
-HistoricalPiece * getLastHistoric(HistoricalPiece * historic)
+Historical * getLastHistoric(Historical * historic)
 {
 	if(historic == nullptr)
 		return nullptr;
 	
 	
-	HistoricalPiece * current  = historic;
+	Historical * current  = historic;
 	
 	while(moveToNextHistorical(current));	
 	
@@ -96,7 +96,7 @@ HistoricalPiece * getLastHistoric(HistoricalPiece * historic)
 }	
 	
 
-HistoricalPiece * getHistoricalPiece(HistoricalPiece *& historic, int pos)
+Historical * getHistorical(Historical *& historic, int pos)
 {
 	if(isEmptyHistorical(historic) || pos < 0 || pos > historic->size)
 		return nullptr;
@@ -104,7 +104,7 @@ HistoricalPiece * getHistoricalPiece(HistoricalPiece *& historic, int pos)
 	if(historic->pos == pos)
 		return historic;
 	
-	HistoricalPiece * current = historic;
+	Historical * current = historic;
 	
 	while(moveToNextHistorical(current)){
 		if(current->pos == pos)
@@ -115,7 +115,7 @@ HistoricalPiece * getHistoricalPiece(HistoricalPiece *& historic, int pos)
 }
 
 
-void removeHistoricalFrom(HistoricalPiece *& historic , int pos)
+void removeHistoricalFrom(Historical *& historic , int pos)
 {
 	if(historic == nullptr)
 		return;
@@ -123,19 +123,19 @@ void removeHistoricalFrom(HistoricalPiece *& historic , int pos)
 	
 	
 	//GUARDO LA POSICION DEL NODO PREVIO A LOS QUE SE VAN A ELIMINAR
-	HistoricalPiece * save = getHistoricalPiece(historic , pos);
+	Historical * save = getHistorical(historic , pos);
 
 	if(save == nullptr) return;
 	
 	//ELEMENTO A ELIMINAR
-	HistoricalPiece * current = save->next;
+	Historical * current = save->next;
 	
 	//EVITAMOS QUE EL ULTIMO NODO ANTES DE BORRAR APUNTE A NADA
 	save->next = nullptr;
 	
 	while(current->next != nullptr){
 		
-		HistoricalPiece * next = current->next;
+		Historical * next = current->next;
 	
 		delete current;
 		

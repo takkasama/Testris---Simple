@@ -1,28 +1,21 @@
-#pragma once
+#include "../header/Hold.h"
 
-struct HoldTetri
-{
-	TetriPiece tetriPiece;
-	char lastPiece;
-	
-	HoldTetri * next;
-};
 
-HoldTetri * buildHoldTetri()
+Hold * buildHold()
 {
-	HoldTetri * holdTetri = new HoldTetri;
+	Hold * hold = new Hold;
 	
-	holdTetri->tetriPiece = buildDefault();
-	holdTetri->next = nullptr;
-	holdTetri->lastPiece = 'D';
+	hold->tetriPiece = buildDefault();
+	hold->next = nullptr;
+	hold->lastPiece = 'D';
 	
-	return holdTetri;
+	return hold;
 }
 
 
 //	PUSH CON INDICADOR QUE SI TIENE UN PIEZA DEVULVE UN FALSE PARA INDICAR QUE NO SE PUEDE COLOCAR UN PIEZA
 //	las condiciones bajo las cuales no puede guardar la pieza son , ya tiene un pieza o la pieza enviada es DEFAULT
-void pushHold(HoldTetri *&node, TetriPiece tetriPiece)
+void pushHold(Hold *&node, TetriPiece tetriPiece)
 {
 	if(node == nullptr)
 		return;
@@ -33,7 +26,7 @@ void pushHold(HoldTetri *&node, TetriPiece tetriPiece)
 	if(node->next != nullptr)
 		return;
 	
-	HoldTetri *newHold = buildHoldTetri();
+	Hold *newHold = buildHold();
 	
 	newHold->tetriPiece = tetriPiece;
 	
@@ -43,7 +36,7 @@ void pushHold(HoldTetri *&node, TetriPiece tetriPiece)
 	
 }
 
-HoldTetri * popHold(HoldTetri *& node)
+Hold * popHold(Hold *& node)
 {
 	if(node == nullptr)
 		return nullptr;
@@ -51,10 +44,11 @@ HoldTetri * popHold(HoldTetri *& node)
 	if(node->next == nullptr)
 		return nullptr;
 	
-	HoldTetri * save = node->next;
+	Hold * save = node->next;
 	
 	node->next = nullptr;
-
+	
 	return save;
 	
 }
+

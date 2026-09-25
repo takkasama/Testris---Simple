@@ -1,45 +1,14 @@
-#pragma once
-#include <fstream> 
-const static string PLAYERS_FILE = "save.txt";
-
-const static string TAG_NAME_O = "<name>";
-const static string TAG_NAME_C = "</name>";
-
-const static string TAG_RECORD_O = "<record>";
-const static string TAG_RECORD_C = "</record>";
-
-const static string TAG_PLAYER_O = "<player>";
-const static string TAG_PLAYER_C = "</player>";
-
-//ESTRUCTURA PARA LA ORGANIZACION DE LAS PERSISTENCIA DE LOS DATOS
-// DEL MISMO PARA LA ORGANIZACION DE LOS TOP RECORDS
-struct Player 
-{
-	string name;
-	int points;
-	int record;
-};
+#include "../header/Player.h"
 
 Player buildPlayer()
 {
 	Player player;
 	player.name = "NONE";
-	player.points = 0;
 	player.record = 0;
 	
 	return player;
 }
 
-//ESTRUCTURA PARA OBTENCION DE LOS DATOS DEL ARCHIVO Y LA ORDENACION DE ESTOS
-//DEL MISMO MODO ESTA SE USARA PARA EL ORDEAMIENTO DE LOS DATOS Y LA OBTECION DEL TOP DE ESTOS
-//EN EL GAME SE USARA COMO UNA ESTRUCTURA FIJA, ES DECIR UN ARREGLO DE 10.
-struct PlayerNode
-{
-	Player player; 
-	
-	PlayerNode * next;
-	
-};
 PlayerNode * buildPlayerNode()
 {
 	PlayerNode * playerNode = new PlayerNode;
@@ -47,7 +16,7 @@ PlayerNode * buildPlayerNode()
 	playerNode->next = nullptr;
 	
 	playerNode->player = buildPlayer();
-		
+	
 	return playerNode;
 }
 
@@ -208,7 +177,7 @@ PlayerNode * readPlayersFile()
 		string player = getTagData(line , TAG_PLAYER_O, TAG_PLAYER_C);
 		
 		if(player != ""){
-		
+			
 			string name = getTagData(line , TAG_NAME_O , TAG_NAME_C);
 			string record = getTagData(line  , TAG_RECORD_O , TAG_RECORD_C);
 			Player player = buildPlayer();
@@ -277,7 +246,7 @@ PlayerNode* createParition(PlayerNode * begin , PlayerNode *& end , PlayerNode *
 	//NODO PARA LA CONECCION PARA LA AYUDA DE LA CONEXION DEL ANTERIO Y EL SIGUIENTE A MOVER
 	PlayerNode * current = begin->next;
 	PlayerNode * prevToCurrent = begin;
-
+	
 	//DECLARACION DEL NUEVO COMIENZO QUE SERIA EL CENTRAL DE LA PARTICION
 	PlayerNode * newBegin = begin;
 	
@@ -307,7 +276,8 @@ PlayerNode* createParition(PlayerNode * begin , PlayerNode *& end , PlayerNode *
 		prevToCurrent = current;
 		current = current->next;
 	}
-
+	
+	end = prevToCurrent;
 	return newBegin;
 }
 
@@ -320,7 +290,8 @@ void quickSort(PlayerNode *& begin , PlayerNode *& end)
 	PlayerNode * parition = begin;
 	
 	
-	//ELEMNTO QUE FUNCIONARA COMO EL LEMENTO 
+	//ELEMNTO QUE FUNCIONARA COMO EL ELEMENTO COMO EL PREVION AL PIVOTE QUE EN UN PRINCIPIO
+	//ESTE ES ELEMENTO CETNRAL
 	PlayerNode * prevToBegin = nullptr;
 	
 	
@@ -376,5 +347,4 @@ void getTopPlayer(Player *& players , int size, bool isQuickSort)
 		current = current->next;
 	}
 }
-
 

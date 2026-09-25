@@ -1,77 +1,17 @@
-#pragma once
-#include "../Board/Board.h"
-#include "GameGraphic.h"
-#include "Level.h"
-#include "Player.h"
-
-//MANEJO DE ESTADOS DE JUEGO PARA EL CONTROL DEL FLUJO DE ESTE
-struct State
-{
-	//congela el juego hasta que se vuelva activar el mismo estado
-	const static int PAUSE = 0;
-	//ciclo de juego normal
-	const static int PLAY = 1;
-	//cuando se acciona el boton de avanzar y retroceder para dar un tiempo de avanzar o retroceder libremente
-	const static int REPRODUCE = 2;
-	//acciones y flujo de menu
-	const static int MENU = 3;
-	//reproducir toda una partida despues de un gameover
-	const static int REPRODUCE_GAME = 4;
-	
-	int currentState;
-};
-
-
-
-//FORMA DE ABREVIAR PARAMETROS DE LAS KEY USADAS PARA EL JUGO
-struct KeyPressed
-{
-	const static int ANY = -1;
-	
-	const static int KEY_L = 0; //DERECHA
-	const static int KEY_K = 1; //ROTAR
-	const static int KEY_J = 2; //IZQUIERDA
-	const static int KEY_H = 3; //MANTENER PIEZA
-	
-	const static int KEY_O = 4; //AVANZAR
-	const static int KEY_U = 5;  //RETROCEDER
-	
-	const static int KEY_ESCAPE = 6; //PAUSA
-	const static int KEY_SPACE = 7; //MOVER HASTA ABAJO UNA PIEZA
-	
-	int currentKey = ANY; // ACTUAL PRESIONADO
-	
-};
-
-
-
-
-// CONECCION ENTRE BOARD Y LAS TEXTURAS
-struct Game
-{
-	const static int MAX_PLAYERS = 10;
-	
-	Board board;
-	Level level;
-
-	GameGraphic graphic;
-	
-	Player player[MAX_PLAYERS];
-	
-	State state;
-};
-
-
+#include "../header/Game.h"
 
 Game builGame()
 {
 	Game game;
 	game.board = buildBoard();
 	game.level = buildLevel();
+	
 	game.graphic = buildGameGraphic();
-
+	game.players = new Player[Game::MAX_PLAYERS];
+	
+	game.currentPlayer = buildPlayer();
+	
 	game.state.currentState = State::PLAY;
-
 	return game;
 }
 
@@ -90,42 +30,42 @@ void verifyKeys(Game & game, KeyPressed & key ,float time)
 			return;
 		
 		switch(key.currentKey){
-			case KeyPressed::KEY_L:
-				moveRight(game.board);
-				key.currentKey = KeyPressed::ANY;
-				break;
-			case KeyPressed::KEY_J:
-				moveLeft(game.board);
-				key.currentKey = KeyPressed::ANY;
-				break;
-			case KeyPressed::KEY_K:
-				rotate(game.board);
-				key.currentKey = KeyPressed::ANY;
-				break;
-			case KeyPressed::KEY_H:
-				holdPiece(game.board);
-				key.currentKey = KeyPressed::ANY;
-				break;
-			case KeyPressed::KEY_SPACE:
-				moveToBottom(game.board);
-				key.currentKey = KeyPressed::ANY;
-				break;
-			case KeyPressed::KEY_ESCAPE:
-				game.state.currentState = State::PAUSE;
-				key.currentKey = KeyPressed::ANY;
-				break;
-			case KeyPressed::KEY_U:
-				goToPrev(game.board);
-				game.graphic.updateTimer = 0.0f;
-				game.state.currentState = State::REPRODUCE;
-				key.currentKey = KeyPressed::ANY;
-				break;
-			case KeyPressed::KEY_O:
-				goToNext(game.board);
-				game.graphic.updateTimer = 0.0f;
-				game.state.currentState = State::REPRODUCE;
-				key.currentKey = KeyPressed::ANY;
-				break;	
+		case KeyPressed::KEY_L:
+			moveRight(game.board);
+		key.currentKey = KeyPressed::ANY;
+		break;
+		case KeyPressed::KEY_J:
+			moveLeft(game.board);
+		key.currentKey = KeyPressed::ANY;
+		break;
+		case KeyPressed::KEY_K:
+			rotate(game.board);
+		key.currentKey = KeyPressed::ANY;
+		break;
+		case KeyPressed::KEY_H:
+			holdPiece(game.board);
+		key.currentKey = KeyPressed::ANY;
+		break;
+		case KeyPressed::KEY_SPACE:
+			moveToBottom(game.board);
+		key.currentKey = KeyPressed::ANY;
+		break;
+		case KeyPressed::KEY_ESCAPE:
+			game.state.currentState = State::PAUSE;
+		key.currentKey = KeyPressed::ANY;
+		break;
+		case KeyPressed::KEY_U:
+			goToPrev(game.board);
+		game.graphic.updateTimer = 0.0f;
+		game.state.currentState = State::REPRODUCE;
+		key.currentKey = KeyPressed::ANY;
+		break;
+		case KeyPressed::KEY_O:
+			goToNext(game.board);
+		game.graphic.updateTimer = 0.0f;
+		game.state.currentState = State::REPRODUCE;
+		key.currentKey = KeyPressed::ANY;
+		break;	
 		}
 		
 		
@@ -154,8 +94,9 @@ void verifyButtons(Game & game)
 		game.state.currentState = State::MENU;
 		return;
 	}
-
+	
 }
+
 
 void updateGame(Game &game, KeyPressed & key ,float time)
 {
@@ -169,7 +110,10 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 		if (game.graphic.updateTimer >= game.level.speed)
 		{
 			game.graphic.updateTimer -= game.level.speed;
-			updateBoard(game.board);
+			
+			//SI NO PUEDO TERMINAR DE ACTULIZAR EL JUEGO ASUME QUE YA SE TERMINO
+			if(!updateBoard(game.board)) game.state.currentState = State::MENU;
+			
 			updateLevel(game.level, getFullRows(game.board));
 			
 		}
@@ -199,8 +143,6 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 
 
 //DIBUJO DE JUEGO 
-
-
 void drawPiecesTextures(Game & game)
 {
 	Row *currentRow = game.board.top;
@@ -305,6 +247,13 @@ void drawNextPieces(Game & game)
 	}
 }
 
+void drawBoardTextSpaces(Game & game)
+{
+	dranText(game.graphic.textures , game.currentPlayer.name , FONT_SIZE , {TEXT_X , TEXT_Y_1});	
+	dranText(game.graphic.textures , to_string(game.level.points) ,FONT_SIZE , {TEXT_X , TEXT_Y_2});
+}
+
+
 
 void drawGame(Game & game)
 {
@@ -315,4 +264,5 @@ void drawGame(Game & game)
 	drawCurrentPiece(game);
 	drawNextPieces(game);
 	drawHoldPiece(game);
+	drawBoardTextSpaces(game);
 }

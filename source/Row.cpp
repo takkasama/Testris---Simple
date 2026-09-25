@@ -1,16 +1,7 @@
-#pragma once
+#include "../header/Row.h"
 
-// PARA ALMACENAR UNA PIEZA Y REPRESENTAR UN ESPACIO DE COLUMNA
-struct Cell
-{
-	// SE DEJA EL TIPO UNICAMENTE DEBIDO A QUE UNA CELDA NO DEBE CONTENER LA PIEZA COMPLETA
-	// DE MODO QUE LA RESPONSABILIDAD DE MANEJO DE POCIONES Y EL HISTORIAL DE ESTE SE ENCARGAR LA
-	// LISTA DE REPRODUCCION
-	char type;
-	
-	// INDICADOR DE SI CELDA ESTA SELECIONADAS
-	bool isSelected;
-};
+
+
 Cell buildCell()
 {
 	Cell cell;
@@ -33,14 +24,7 @@ void cleanCell(Cell &cell)
 	cell.type = 'D';
 }
 
-// LISTA DOBLEMENTE ENLAZADA REQUERIDA PARA LA CONSTRUCCION DEL TABLERO
-struct Row
-{
-	const static int MAX_COLUMNS = 10;
-	Cell cell[MAX_COLUMNS];
-	
-	Row *next, *prev;
-};
+
 
 bool isEmptyRow(Row *row) { return row == nullptr; }
 
