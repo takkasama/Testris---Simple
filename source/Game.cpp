@@ -7,14 +7,73 @@ Game builGame()
 	game.level = buildLevel();
 	
 	game.graphic = buildGameGraphic();
-	game.players = new Player[Game::MAX_PLAYERS];
-	
 	game.currentPlayer = buildPlayer();
 	
 	game.state.currentState = State::PLAY;
+	
+	game.menu = buildMenu();
+	
 	return game;
 }
 
+void resetGame(Game & game)
+{
+	game.board = buildBoard();
+	game.currentPlayer = game.menu.selectedPlayer;
+	game.state.currentState = State::PLAY;
+}
+
+void updateGame(Game &game, KeyPressed & key ,float time)
+{
+	
+	if(game.state.currentState == State::START_GAME){
+		resetGame(game);
+		return;
+	}
+	if(game.state.currentState == State::PLAY){
+		game.graphic.updateTimer += time;
+		
+		verifyKeys(game , key , time);
+		verifyButtonsBoard(game);
+		
+		
+		
+		if (game.graphic.updateTimer >= game.level.speed)
+		{
+			game.graphic.updateTimer -= game.level.speed;
+			
+			//SI NO PUEDO TERMINAR DE ACTULIZAR EL JUEGO ASUME QUE YA SE TERMINO
+			if(!updateBoard(game.board)) game.state.currentState = State::MENU;
+			
+			updateLevel(game.level, getFullRows(game.board));
+			
+		}
+		return;
+	}
+	if(game.state.currentState == State::PAUSE){
+		
+		
+		//PUASE ACTION
+		return;
+	}
+	if(game.state.currentState == State::REPRODUCE){
+		game.graphic.updateTimer += time;
+		cleanCellsToHistorical(game.board);
+		if(game.graphic.updateTimer >= 4.0f){
+			game.state.currentState = State::PLAY;
+		}
+		return;
+	}
+	if(game.state.currentState == State::MENU){
+		verifyButtonsMenu(game.menu , game.state);
+		
+		
+		
+		return;
+	}
+	
+	
+}
 
 
 
@@ -72,7 +131,7 @@ void verifyKeys(Game & game, KeyPressed & key ,float time)
 	}
 }
 
-void verifyButtons(Game & game)
+void verifyButtonsBoard(Game & game)
 {
 	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_1_X , BUTTON_Y) , "back")){
 		goToPrev(game.board);
@@ -90,54 +149,10 @@ void verifyButtons(Game & game)
 		game.state.currentState =State::PAUSE;
 		return;
 	}
-	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_4_X , BUTTON_Y) , "exit")){		
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_4_X , BUTTON_Y) , "close")){		
 		game.state.currentState = State::MENU;
 		return;
 	}
-	
-}
-
-
-void updateGame(Game &game, KeyPressed & key ,float time)
-{
-	
-	verifyKeys(game , key , time);
-	verifyButtons(game);
-	
-	if(game.state.currentState == State::PLAY){
-		game.graphic.updateTimer += time;
-		
-		if (game.graphic.updateTimer >= game.level.speed)
-		{
-			game.graphic.updateTimer -= game.level.speed;
-			
-			//SI NO PUEDO TERMINAR DE ACTULIZAR EL JUEGO ASUME QUE YA SE TERMINO
-			if(!updateBoard(game.board)) game.state.currentState = State::MENU;
-			
-			updateLevel(game.level, getFullRows(game.board));
-			
-		}
-		return;
-	}
-	if(game.state.currentState == State::PAUSE){
-		
-		
-		//PUASE ACTION
-		return;
-	}
-	if(game.state.currentState == State::REPRODUCE){
-		game.graphic.updateTimer += time;
-		cleanCellsToHistorical(game.board);
-		if(game.graphic.updateTimer >= 4.0f){
-			game.state.currentState = State::PLAY;
-		}
-		return;
-	}
-	if(game.state.currentState == State::MENU){
-		//menu actions
-		return;
-	}
-	
 	
 }
 
@@ -186,22 +201,35 @@ void drawCurrentPiece(Game & game)
 
 
 
-void drawBackground(Game & game)
+void drawBackgroundBoard(Game & game)
 {
 	
 	Position pos = buildPosition(0.0f , 0.0f);
-	drawTexture(game.graphic.textures , "board" , pos);
+	drawTexture(game.graphic.textures , "boardBackground" , pos);
 	
-}
-
-void drawButtonsBoard(Game & game)
-{	
 	drawTexture(game.graphic.textures, "back" ,buildPosition(BUTTON_1_X, BUTTON_Y));
 	drawTexture(game.graphic.textures, "advance" ,buildPosition(BUTTON_2_X, BUTTON_Y));
 	drawTexture(game.graphic.textures, "pause" ,buildPosition(BUTTON_3_X, BUTTON_Y));
-	drawTexture(game.graphic.textures, "retry" ,buildPosition(BUTTON_4_X, BUTTON_Y));
-}
+	drawTexture(game.graphic.textures, "close" ,buildPosition(BUTTON_4_X, BUTTON_Y));
+	
+	drawText(game.graphic.textures , game.currentPlayer.name , FONT_SIZE , {TEXT_X , TEXT_Y_1});	
+	drawText(game.graphic.textures , to_string(game.level.points) ,FONT_SIZE , {TEXT_X , TEXT_Y_2});
 
+	
+	//CONSTRUCCION DE LA PRIMERA FILA INFERIOR (ESTA DE EXTRA)
+	TetriPiece defaultPiece = buildDefault();
+	defaultPiece.pieces[0].y = 20;
+	for(int i = 0; i < Row::MAX_COLUMNS; i++){
+		
+		Position pos = buildPosition(defaultPiece.pieces[0].x , defaultPiece.pieces[0].y);
+		
+		pos  = getTexturePosition(pos.x , pos.y);
+		drawTexture(game.graphic.textures, "TetriD" , pos);
+		
+		defaultPiece.pieces[0].x++;
+	}
+	
+}
 
 void drawHoldPiece(Game & game)
 {
@@ -217,24 +245,6 @@ void drawHoldPiece(Game & game)
 	
 }
 
-
-//SE CONTRUYO EL TABLERO CON UNA FILA DE MAS, POR LO QUE DICHA FILA SE CONTRUYE CON UN FILA DE TETRI DEFAULT 
-void drawLastRow(Game & game)
-{
-	TetriPiece defaultPiece = buildDefault();
-	defaultPiece.pieces[0].y = 20;
-	
-	for(int i = 0; i < Row::MAX_COLUMNS; i++){
-		
-		Position pos = buildPosition(defaultPiece.pieces[0].x , defaultPiece.pieces[0].y);
-		
-		pos  = getTexturePosition(pos.x , pos.y);
-		drawTexture(game.graphic.textures, "TetriD" , pos);
-		
-		defaultPiece.pieces[0].x++;
-	}
-}
-
 void drawNextPieces(Game & game)
 {
 	
@@ -247,22 +257,20 @@ void drawNextPieces(Game & game)
 	}
 }
 
-void drawBoardTextSpaces(Game & game)
-{
-	dranText(game.graphic.textures , game.currentPlayer.name , FONT_SIZE , {TEXT_X , TEXT_Y_1});	
-	dranText(game.graphic.textures , to_string(game.level.points) ,FONT_SIZE , {TEXT_X , TEXT_Y_2});
-}
-
-
 
 void drawGame(Game & game)
 {
-	drawBackground(game);
-	drawButtonsBoard(game);
-	drawPiecesTextures(game);
-	drawLastRow(game);
-	drawCurrentPiece(game);
-	drawNextPieces(game);
-	drawHoldPiece(game);
-	drawBoardTextSpaces(game);
+	if(game.state.currentState == State::PLAY)
+	{
+		drawBackgroundBoard(game);
+		drawPiecesTextures(game);
+		drawCurrentPiece(game);
+		drawNextPieces(game);
+		drawHoldPiece(game);
+	}
+	
+	if(game.state.currentState == State::MENU)
+		drawMenu(game.menu);
+	
+
 }

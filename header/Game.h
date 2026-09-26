@@ -6,28 +6,11 @@
 #include "GameGraphic.h"
 #include "Level.h"
 #include "Player.h"
+#include "State.h"
+#include "Menu.h"
+
 
 using namespace std;
-
-
-//MANEJO DE ESTADOS DE JUEGO PARA EL CONTROL DEL FLUJO DE ESTE
-struct State
-{
-	//congela el juego hasta que se vuelva activar el mismo estado
-	const static int PAUSE = 0;
-	//ciclo de juego normal
-	const static int PLAY = 1;
-	//cuando se acciona el boton de avanzar y retroceder para dar un tiempo de avanzar o retroceder libremente
-	const static int REPRODUCE = 2;
-	//acciones y flujo de menu
-	const static int MENU = 3;
-	//reproducir toda una partida despues de un gameover
-	const static int REPRODUCE_GAME = 4;
-	
-	int currentState;
-};
-
-
 
 //FORMA DE ABREVIAR PARAMETROS DE LAS KEY USADAS PARA EL JUGO
 struct KeyPressed
@@ -50,40 +33,38 @@ struct KeyPressed
 };
 
 
-
-
 // CONECCION ENTRE BOARD Y LAS TEXTURAS
 struct Game
-{
-	const static int MAX_PLAYERS = 10;
-	
+{	
 	Board board;
 	Level level;
 
-	GameGraphic graphic;
-	
-	Player * players;
+	GameGraphic graphic;	
 	Player currentPlayer;
-	
-	
 	State state;
+	
+	
+	Menu menu;
 };
 
 Game builGame();
-
+void resetGame(Game & game);
 
 //VERIFICAINOES Y ACTUALIZACION DEL JUEGO
 void verifyKeys(Game & game, KeyPressed & key ,float time);
-void verifyButtons(Game & game);
+void verifyButtonsBoard(Game & game);
+
 void updateGame(Game &game, KeyPressed & key ,float time);
 
 //DIBUJO DE JUEGO 
 void drawPiecesTextures(Game & game);
 void drawCurrentPiece(Game & game);
 void drawBackground(Game & game);
-void drawButtonsBoard(Game & game);
 void drawHoldPiece(Game & game);
-void drawLastRow(Game & game);
 void drawNextPieces(Game & game);
-void drawBoardTextSpaces(Game & game);
+
+
+	
 void drawGame(Game & game);
+
+

@@ -32,7 +32,7 @@ Player buildPlayer();
 struct PlayerNode
 {
 	Player player; 
-	
+		
 	PlayerNode * next;
 	
 };
@@ -42,6 +42,8 @@ PlayerNode * buildPlayerNode();
 void addPlayerNode(PlayerNode *& node, Player player);
 
 PlayerNode * getLastPlayerNode(PlayerNode *& node);
+
+int getSizePlayerNode(PlayerNode * node);
 
 bool openOutFile(ofstream & outFile, bool isToAdd);
 
@@ -71,4 +73,5 @@ void orderPlayerByQuickSort(PlayerNode *& node);
 //METODO DE OBTENCION DEL TOP DE JUGADORES QUE RECIBBE UN PUNTERO DE UN ARREGLO DE 
 //DE JUGADORES, PARA EL LLENGADO DE ESTOS, DEL MISMO MODO DEL METODO DE ORDENACION QUE SE
 //DESEA PARA LOS JUGAORES
-void getTopPlayer(Player *& players, int size, bool isQuickSort);
+Player * getTopPlayer(bool isQuickSort , int & totalPlayers);
+	
