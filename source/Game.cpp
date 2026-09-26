@@ -68,10 +68,8 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 		}
 		return;
 	}
-	if(game.state.currentState == State::MENU){
-		verifyButtonsMenu(game.menu , game.state);
-		verifyBoxRecords(game.menu);
-		verifyTextInputNameBox(game.menu);
+	if(game.state.currentState == State::MENU || game.state.currentState == State::SETTINGS){
+		verifyMenu(game.menu , game.state);
 		return;
 	}
 	
@@ -272,8 +270,8 @@ void drawGame(Game & game)
 		drawHoldPiece(game);
 	}
 	
-	if(game.state.currentState == State::MENU)
-		drawMenu(game.menu);
+	if(game.state.currentState == State::MENU || game.state.currentState == State::SETTINGS)
+		drawMenu(game.menu, game.state);
 	
 
 }

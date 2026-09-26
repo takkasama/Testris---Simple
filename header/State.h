@@ -20,7 +20,7 @@ struct State
 	const static int REPRODUCE_GAME = 5;
 	
 	//ESTADOS DE NAVEGACION DE MENU
-	
+	const static int SETTINGS = 6;
 	
 	
 	int currentState;

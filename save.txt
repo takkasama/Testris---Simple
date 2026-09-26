@@ -13,3 +13,4 @@
 <player><name>Nova_000013</name><record>276542</record></player>
 <player><name>Kira_000014</name><record>278640</record></player>
 <player><name>Nova_000015</name><record>90707</record></player>
+<player><name></name><record>0</record></player>

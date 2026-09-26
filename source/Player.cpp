@@ -258,7 +258,7 @@ void orderPlayerByBubbleSort(PlayerNode *& node)
 		isValidSort = false;
 		
 		while(current != nullptr && current->next != nullptr){
-			if(current->player.record > current->next->player.record){
+			if(current->player.record < current->next->player.record){
 				
 				PlayerNode * save = current->next;
 				current->next = save->next;

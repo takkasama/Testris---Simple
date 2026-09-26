@@ -2,18 +2,22 @@
 
 void loadMenuTextures(Menu & menu)
 {
-	addTexture(menu.textures, "boardBackground", false);
+	addTexture(menu.textures, "settingsBackground", false);
 	addTexture(menu.textures, "menuBackground", false);
+	
 	
 	addTexture(menu.textures, "playerBox", false);
 	
-	addTexture(menu.textures, "replay", false);
+	addTexture(menu.textures, "reload", false);
 	addTexture(menu.textures, "exit", false);
 	addTexture(menu.textures, "settings", false);
 	addTexture(menu.textures, "start", false);
+	addTexture(menu.textures, "empty", false);
+	
 	
 	addTexture(menu.textures, "playerNameBox", false);
 	addTexture(menu.textures, "playerRecordBox", false);
+	addTexture(menu.textures, "settingsText", false);
 	
 	addTexture(menu.textures, "clean", false);
 	
@@ -22,11 +26,12 @@ void loadMenuTextures(Menu & menu)
 Menu buildMenu()
 {
 	Menu menu;
+	menu.isQuickSort = true;
+	
 	menu.textNameBox = "";
 	
 	menu.saveNameToModify = "";
-	
-	menu.players = getTopPlayer(true , menu.totalPlayers);
+	menu.players = getTopPlayer(menu.isQuickSort , menu.totalPlayers);
 	menu.selectedPlayer = buildPlayer();
 	menu.saveSelectedPos = -1;
 	
@@ -37,10 +42,25 @@ Menu buildMenu()
 	return menu;
 }
 
+void verifyMenu(Menu & menu , State & state)
+{
+	if(state.currentState == State::MENU){
+		verifyBoxRecords(menu);
+		verifyButtonsMenu(menu , state);
+		verifyTextInputNameBox(menu);
+		return;
+	}
+	
+	if(state.currentState == State::SETTINGS)
+		verifyButtonsSettings(menu, state);
+	
+}
+
+
 void verifyButtonsMenu(Menu & menu , State & state)
 {
-	if(isPressTexture(menu.textures , buildPosition(BUTTON_MENU_X_1 , BUTTON_MENU_Y) , "exit")){
-		CloseWindow();
+	if(isPressTexture(menu.textures , buildPosition(BUTTON_MENU_X_1 , BUTTON_MENU_Y) , "reload")){
+		menu.players = getTopPlayer(menu.isQuickSort , menu.totalPlayers);
 		return;
 	}
 	
@@ -61,7 +81,7 @@ void verifyButtonsMenu(Menu & menu , State & state)
 	}
 	
 	if(isPressTexture(menu.textures , buildPosition(BUTTON_MENU_X_3 , BUTTON_MENU_Y) , "settings")){
-		
+		state.currentState = State::SETTINGS;
 		return;
 	}
 	
@@ -74,6 +94,22 @@ void verifyButtonsMenu(Menu & menu , State & state)
 	}
 	
 }
+
+void verifyButtonsSettings(Menu & menu , State & state)
+{
+	if(isPressTexture(menu.textures , {BUTTON_TYPE_SORT_X_1 , BUTTON_TYPE_SORT_Y}, "empty")){
+		menu.isQuickSort = true;
+		state.currentState = State::MENU;
+		return;
+	}
+	if(isPressTexture(menu.textures , {BUTTON_TYPE_SORT_X_2 , BUTTON_TYPE_SORT_Y}, "empty")){
+		menu.isQuickSort = false;
+		state.currentState = State::MENU;
+		return;
+	}
+	
+}
+
 
 void verifyBoxRecords(Menu & menu)
 {
@@ -113,7 +149,7 @@ void verifyTextInputNameBox(Menu & menu)
 void drawBackgroundMenu(Menu & menu)
 {	
 	drawTexture(menu.textures , "menuBackground" , {0.0f ,0.0f});
-	drawTexture(menu.textures , "exit" , {BUTTON_MENU_X_1 ,BUTTON_MENU_Y});
+	drawTexture(menu.textures , "reload" , {BUTTON_MENU_X_1 ,BUTTON_MENU_Y});
 	drawTexture(menu.textures , "start" , {BUTTON_MENU_X_2 ,BUTTON_MENU_Y});
 	drawTexture(menu.textures , "settings" , {BUTTON_MENU_X_3 ,BUTTON_MENU_Y});
 	
@@ -139,9 +175,25 @@ void drawTopRecordPlayers(Menu & menu)
 	}
 }
 
+void drawSettings(Menu & menu)
+{	
+	
+	drawTexture(menu.textures , "settingsBackground" , {SETTINGS_BACKGROUND_X, SETTINGS_BACKGROUND_Y});
+	drawTexture(menu.textures , "empty" , {BUTTON_TYPE_SORT_X_1, BUTTON_TYPE_SORT_Y});
+	drawTexture(menu.textures , "empty" , {BUTTON_TYPE_SORT_X_2, BUTTON_TYPE_SORT_Y});
+	drawTexture(menu.textures , "settingsText" , {TITLE_B0X_X, TITLE_B0X_Y});
+	
+	drawText(menu.textures," Sorting Type ", FONT_SIZE_MENU_H1 ,{TITLE_TEXT_X , TITLE_TEXT_Y});
 
-void drawMenu(Menu & menu)
+	drawText(menu.textures," QUICKSORT ", FONT_SIZE_MENU_H3 ,{TEXT_TYPE_SORT_X_1 ,TEXT_TYPE_SORT_Y});
+	drawText(menu.textures," BUBBLESORT ", FONT_SIZE_MENU_H3 ,{ TEXT_TYPE_SORT_X_2 ,TEXT_TYPE_SORT_Y});
+	
+}
+
+void drawMenu(Menu & menu, State & state)
 {
 	drawBackgroundMenu(menu);
 	drawTopRecordPlayers(menu);
+	
+	if(state.currentState == State::SETTINGS) drawSettings(menu);
 }
