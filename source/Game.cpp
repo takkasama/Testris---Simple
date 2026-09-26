@@ -19,7 +19,9 @@ Game builGame()
 void resetGame(Game & game)
 {
 	game.board = buildBoard();
+	
 	game.currentPlayer = game.menu.selectedPlayer;
+	
 	game.state.currentState = State::PLAY;
 }
 
@@ -43,14 +45,9 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 			game.graphic.updateTimer -= game.level.speed;
 			
 			//SI NO PUEDO TERMINAR DE ACTULIZAR EL JUEGO ASUME QUE YA SE TERMINO
-			if(!updateBoard(game.board)) {
-				game.currentPlayer.points = game.level.points;
-				writePlayerToFile(game.currentPlayer);
-				
-				game.menu.players = getTopPlayer();
-				
-				game.state.currentState = State::MENU;
-			}
+			if(!updateBoard(game.board)) 
+				reloadMenu(game.menu , game.state, game.level.points);
+			
 			
 			updateLevel(game.level, getFullRows(game.board));
 			
@@ -157,8 +154,8 @@ void verifyButtonsBoard(Game & game)
 		game.state.currentState =State::PAUSE;
 		return;
 	}
-	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_4_X , BUTTON_Y) , "close")){		
-		game.state.currentState = State::MENU;
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_4_X , BUTTON_Y) , "close")){				
+		reloadMenu(game.menu, game.state , game.level.points);
 		return;
 	}
 	

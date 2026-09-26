@@ -123,25 +123,35 @@ bool isPlayerRegisterOnFile(string name)
 	return false;	
 }
 
-void updateRecordToPlayer(Player & player)
+bool updatePlayer(Player & player , bool isModifyName , bool isToDelete, string newName)
 {
 	ifstream inFile;
 	ofstream outTemp("temp.txt");
 	
 	if(!openInFile(inFile) || !outTemp.is_open())
-		return;
+		return false;
 	
-	string name = player.name;
-	int record = player.record > player.points ? player.record : player.points;
+	string nameBase = player.name;
+	
+	int record = player.record > player.points ? player.record : player.points;	
+	string name = isModifyName ? newName : nameBase;
+	
+	bool wasModify = false;
 	
 	string line;
 	while(getline(inFile , line)){
+		
 		string player  = getTagData(line , TAG_PLAYER_O , TAG_PLAYER_C);
 		string nameTag  = getTagData(line, TAG_NAME_O , TAG_NAME_C);
-		if(player != "" && nameTag == name){
-			string nameModify  = TAG_NAME_O + nameTag + TAG_NAME_C;
-			string recordModify = TAG_RECORD_O + to_string(record) +  TAG_RECORD_C;
-			outTemp << TAG_PLAYER_O + nameModify + recordModify + TAG_PLAYER_C << endl;		
+		
+		if(player != "" && (nameTag == nameBase) && !wasModify){
+			wasModify = true;
+			if(isToDelete) continue;
+			
+			string nameToWrite  = TAG_NAME_O + name + TAG_NAME_C;
+			string recordToWrite = TAG_RECORD_O + to_string(record) +  TAG_RECORD_C;
+			
+			outTemp << TAG_PLAYER_O + nameToWrite + recordToWrite + TAG_PLAYER_C << endl;		
 		}
 		else	
 		   outTemp << line << endl;		
@@ -149,9 +159,15 @@ void updateRecordToPlayer(Player & player)
 	
 	inFile.close();
 	outTemp.close();
+		
+	if(!remove(PLAYERS_FILE.c_str())) || !rename("temp.txt" , PLAYERS_FILE.c_str());
+		return false;
 	
-	remove(PLAYERS_FILE.c_str());
-	rename("temp.txt" , PLAYERS_FILE.c_str());
+	
+	if(wasModify) player.name = name;
+	
+	
+	return wasModify;
 }
 
 void addNewPlayerToFile(Player player)
@@ -173,7 +189,7 @@ void addNewPlayerToFile(Player player)
 void writePlayerToFile(Player & player)
 {
 	if(isPlayerRegisterOnFile(player.name))
-		updateRecordToPlayer(player);
+		updatePlayer(player , false , false , "");
 	else
 		addNewPlayerToFile(player);
 	
@@ -211,40 +227,6 @@ PlayerNode * readPlayersFile()
 	return list;
 }
 
-bool modifyPlayerName(string name , string newName)
-{
-	ifstream inFile;
-	ofstream outTemp("temp.txt");
-	
-	if(!openInFile(inFile) || !outTemp.is_open())
-		return false;
-	bool wawModify = false;
-	
-	string line;
-	while(getline(inFile , line)){
-		string player  = getTagData(line , TAG_PLAYER_O , TAG_PLAYER_C);
-		string nameTag  = getTagData(line, TAG_NAME_O , TAG_NAME_C);
-		string recordTag = getTagData(line , TAG_RECORD_O , TAG_RECORD_C);
-		
-		if(player != "" && nameTag == name){
-			string nameModify  = TAG_NAME_O + newName + TAG_NAME_C;
-			string recordModify = TAG_RECORD_O + recordTag +  TAG_RECORD_C;
-			outTemp << TAG_PLAYER_O + nameModify + recordModify + TAG_PLAYER_C << endl;		
-			wawModify = true;
-		}
-		else	
-		   outTemp << line << endl;		
-	}
-	
-	inFile.close();
-	outTemp.close();
-	
-	remove(PLAYERS_FILE.c_str());
-	rename("temp.txt" , PLAYERS_FILE.c_str());
-	
-	return wawModify;
-	
-}
 
 void orderPlayerByBubbleSort(PlayerNode *& node)
 {
@@ -393,11 +375,11 @@ Player * getTopPlayer(bool isQuickSort , int & totalPlayers)
 	
 	PlayerNode * current = listPlayers;
 	
-	totalPlayers = getSizePlayerNode(listPlayers) <= 10 ? getSizePlayerNode(listPlayers) : 10;
+	totalPlayers = getSizePlayerNode(listPlayers) < 10 ? getSizePlayerNode(listPlayers) -1  : 9;
 	
 	Player * players = new Player[totalPlayers];
 	
-	for(int i = 0 ; i < totalPlayers && current->next != nullptr; i++)
+	for(int i = 0 ; i < totalPlayers && current != nullptr; i++)
 	{
 		Player player = current->player;
 		players[i] = player;

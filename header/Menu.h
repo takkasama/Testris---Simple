@@ -74,9 +74,8 @@ struct Menu
 void loadMenuTextures(Menu & menu);
 Menu buildMenu();
 
-//en caso de que no se encuentre en el top 10 - se buscara en el archivo para encontrar el archivo para ver si existe o no
-void loadPlayerToFile();
-
+void reloadPlayers(Menu & menu);
+void reloadMenu(Menu & menu , State & state , int points);
 
 //MENU ACCION
 void verifyButtonsMenu(Menu & menu , State & state);

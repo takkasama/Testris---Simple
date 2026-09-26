@@ -56,21 +56,44 @@ void verifyMenu(Menu & menu , State & state)
 	
 }
 
+void reloadPlayers(Menu & menu)
+{
+	menu.players = getTopPlayer(menu.isQuickSort , menu.totalPlayers);
+}
+
+
+void reloadMenu(Menu & menu , State & state, int points)
+{
+	if(points >= 0){
+		menu.selectedPlayer.points = points;
+		writePlayerToFile(menu.selectedPlayer);
+	}
+	reloadPlayers(menu);
+	menu.saveSelectedPos = -1;
+	menu.saveNameToModify = "";
+	menu.selectedPlayer = buildPlayer();
+	
+	state.currentState = State::MENU;	
+}
+
 
 void verifyButtonsMenu(Menu & menu , State & state)
 {
 	if(isPressTexture(menu.textures , buildPosition(BUTTON_MENU_X_1 , BUTTON_MENU_Y) , "reload")){
-		menu.players = getTopPlayer(menu.isQuickSort , menu.totalPlayers);
+		reloadMenu(menu , state , -1);
 		return;
 	}
 	
 	if(isPressTexture(menu.textures , buildPosition(BUTTON_MENU_X_2 , BUTTON_MENU_Y) , "start")){
-		if(!menu.saveNameToModify.empty()){
-			if(modifyPlayerName(menu.saveNameToModify , menu.textNameBox)){
+		if(!menu.saveNameToModify.empty() && menu.saveSelectedPos != -1){
+			if(updatePlayer(menu.players[menu.saveSelectedPos] , true  ,false , menu.textNameBox)){
+				
 				menu.selectedPlayer.name = menu.textNameBox;
+				
 				menu.players[menu.saveSelectedPos].name = menu.textNameBox;
 				menu.saveNameToModify = "";
 				menu.saveSelectedPos = -1;
+				
 			}
 		}
 		menu.selectedPlayer.name = menu.textNameBox.empty() ? "NO NAME" : menu.textNameBox;
@@ -86,6 +109,11 @@ void verifyButtonsMenu(Menu & menu , State & state)
 	}
 	
 	if(isPressTexture(menu.textures , buildPosition(CLEAN_BUTTON_BOX_X , CLEAN_BUTTON_BOX_Y) , "clean")){
+		
+		if(!menu.saveNameToModify.empty() && menu.saveSelectedPos != -1 && 
+		   menu.saveNameToModify == menu.players[menu.saveSelectedPos].name)
+			updatePlayer(menu.players[menu.saveSelectedPos], false , true , "");
+		
 		menu.textNameBox = "";
 		menu.saveNameToModify = "";
 		menu.selectedPlayer = buildPlayer();
@@ -99,11 +127,12 @@ void verifyButtonsSettings(Menu & menu , State & state)
 {
 	if(isPressTexture(menu.textures , {BUTTON_TYPE_SORT_X_1 , BUTTON_TYPE_SORT_Y}, "empty")){
 		menu.isQuickSort = true;
-		state.currentState = State::MENU;
+		reloadPlayers(menu);
 		return;
 	}
 	if(isPressTexture(menu.textures , {BUTTON_TYPE_SORT_X_2 , BUTTON_TYPE_SORT_Y}, "empty")){
 		menu.isQuickSort = false;
+		reloadPlayers(menu);
 		state.currentState = State::MENU;
 		return;
 	}
@@ -115,7 +144,7 @@ void verifyBoxRecords(Menu & menu)
 {
 	float pos = RECORD_BOX_Y_INITIAL;
 	
-	for(int i = 0; i < menu.totalPlayers; i++)
+	for(int i = 0; i < menu.totalPlayers - 1; i++)
 	{
 		if(isPressTexture(menu.textures , {RECORD_BOX_X , pos}, "playerRecordBox")){
 			menu.saveNameToModify = menu.players[i].name;
