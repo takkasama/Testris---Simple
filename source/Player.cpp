@@ -159,12 +159,12 @@ bool updatePlayer(Player & player , bool isModifyName , bool isToDelete, string 
 	
 	inFile.close();
 	outTemp.close();
-		
-	if(!remove(PLAYERS_FILE.c_str())) || !rename("temp.txt" , PLAYERS_FILE.c_str());
-		return false;
 	
+	if(wasModify) 
+		player.name = name;
 	
-	if(wasModify) player.name = name;
+	remove(PLAYERS_FILE.c_str());
+	rename("temp.txt" , PLAYERS_FILE.c_str());
 	
 	
 	return wasModify;

@@ -64,6 +64,20 @@ void reloadPlayers(Menu & menu)
 
 void reloadMenu(Menu & menu , State & state, int points)
 {
+	if(!menu.saveNameToModify.empty() && menu.saveSelectedPos != -1){
+		if(updatePlayer(menu.players[menu.saveSelectedPos] , true  ,false , menu.textNameBox)){
+			
+			menu.selectedPlayer.name = menu.textNameBox;
+			
+			menu.players[menu.saveSelectedPos].name = menu.textNameBox;
+			menu.saveNameToModify = "";
+			menu.saveSelectedPos = -1;
+			
+			menu.textNameBox = "";
+			
+		}
+	}
+	
 	if(points >= 0){
 		menu.selectedPlayer.points = points;
 		writePlayerToFile(menu.selectedPlayer);
