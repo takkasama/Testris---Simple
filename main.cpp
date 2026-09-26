@@ -3,12 +3,10 @@
 int main()
 {
 	srand(time(nullptr));	
-	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_TOPMOST | FLAG_WINDOW_TRANSPARENT);
+	SetConfigFlags( FLAG_WINDOW_TOPMOST | FLAG_WINDOW_TRANSPARENT);
 	
 	const static int WIDTH = 710;
 	const static int HEIGHT = 990;
-	
-	
 	
 	InitWindow(WIDTH, HEIGHT, "TETRIS");
 	SetTargetFPS(60);

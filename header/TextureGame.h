@@ -8,7 +8,7 @@ using namespace std;
 const string PATH_PIECES = "resources/Pieces/";
 const string PATH_BUTTONS = "resources/Background/";	
 
-const string FONT_7_SEGMENT_PATH = "resources/7segment.ttf";
+const string FONT_7_SEGMENT_PATH = "resources/fonts/EvilEmpire.otf";
 //DrawRectangleLines(fontPosition.x, fontPosition.y, textSize.x, textSize.y, RED);
 //void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);	
 struct Position
@@ -50,6 +50,6 @@ void cleanTextures(TextureGame *& texture);
 
 void drawTexture(TextureGame *& texture, string nameFile, Position position);
 
-void dranText(TextureGame *& texture, string text, float fontSize, Position position);
+void drawText(TextureGame *& texture, string text, float fontSize, Position position);
 
 bool isPressTexture(TextureGame *& texture, Position position, string nameFile);
