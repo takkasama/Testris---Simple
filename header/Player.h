@@ -38,36 +38,26 @@ struct PlayerNode
 };
 
 PlayerNode * buildPlayerNode();
-
 void addPlayerNode(PlayerNode *& node, Player player);
-
 PlayerNode * getLastPlayerNode(PlayerNode *& node);
-
 int getSizePlayerNode(PlayerNode * node);
 
 bool openOutFile(ofstream & outFile, bool isToAdd);
-
 bool openInFile(ifstream & inFile);
 
 string getTagData(string line, string tag1, string tag2);
-
-bool isPlayeRegisterOnFile(string name);
-
+bool isPlayerRegisterOnFile(string name);
 void updateRecordToPlayer(string name, int record);
-
 void addNewPlayerToFile(Player player);
-
 void writePlayerToFile(Player & player);
-
 //LECTURA DEL ARCHIVO DE SAVE, DE LOS PLAYERS Y CARGADO A LA LISTA DE JUGADORES
 PlayerNode * readPlayersFile();
 
+bool modifyPlayerName(string name , string newName);
+
 void orderPlayerByBubbleSort(PlayerNode *& node);
-
 PlayerNode* createParition(PlayerNode * begin, PlayerNode *& end, PlayerNode *& prevToBegin);
-
 void quickSort(PlayerNode *& begin, PlayerNode *& end);
-
 void orderPlayerByQuickSort(PlayerNode *& node);
 
 //METODO DE OBTENCION DEL TOP DE JUGADORES QUE RECIBBE UN PUNTERO DE UN ARREGLO DE 

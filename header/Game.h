@@ -43,7 +43,6 @@ struct Game
 	Player currentPlayer;
 	State state;
 	
-	
 	Menu menu;
 };
 

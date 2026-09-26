@@ -9,7 +9,7 @@ Game builGame()
 	game.graphic = buildGameGraphic();
 	game.currentPlayer = buildPlayer();
 	
-	game.state.currentState = State::PLAY;
+	game.state.currentState = State::MENU;
 	
 	game.menu = buildMenu();
 	
@@ -58,6 +58,10 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 	}
 	if(game.state.currentState == State::REPRODUCE){
 		game.graphic.updateTimer += time;
+		
+		verifyKeys(game , key , time);
+		verifyButtonsBoard(game);
+		
 		cleanCellsToHistorical(game.board);
 		if(game.graphic.updateTimer >= 4.0f){
 			game.state.currentState = State::PLAY;
@@ -66,9 +70,8 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 	}
 	if(game.state.currentState == State::MENU){
 		verifyButtonsMenu(game.menu , game.state);
-		
-		
-		
+		verifyBoxRecords(game.menu);
+		verifyTextInputNameBox(game.menu);
 		return;
 	}
 	
@@ -91,39 +94,39 @@ void verifyKeys(Game & game, KeyPressed & key ,float time)
 		switch(key.currentKey){
 		case KeyPressed::KEY_L:
 			moveRight(game.board);
-		key.currentKey = KeyPressed::ANY;
+			key.currentKey = KeyPressed::ANY;
 		break;
 		case KeyPressed::KEY_J:
 			moveLeft(game.board);
-		key.currentKey = KeyPressed::ANY;
+			key.currentKey = KeyPressed::ANY;
 		break;
 		case KeyPressed::KEY_K:
 			rotate(game.board);
-		key.currentKey = KeyPressed::ANY;
+			key.currentKey = KeyPressed::ANY;
 		break;
 		case KeyPressed::KEY_H:
 			holdPiece(game.board);
-		key.currentKey = KeyPressed::ANY;
+			key.currentKey = KeyPressed::ANY;
 		break;
 		case KeyPressed::KEY_SPACE:
 			moveToBottom(game.board);
-		key.currentKey = KeyPressed::ANY;
+			key.currentKey = KeyPressed::ANY;
 		break;
 		case KeyPressed::KEY_ESCAPE:
 			game.state.currentState = State::PAUSE;
-		key.currentKey = KeyPressed::ANY;
+			key.currentKey = KeyPressed::ANY;
 		break;
 		case KeyPressed::KEY_U:
 			goToPrev(game.board);
-		game.graphic.updateTimer = 0.0f;
-		game.state.currentState = State::REPRODUCE;
-		key.currentKey = KeyPressed::ANY;
+			game.graphic.updateTimer = 0.0f;
+			game.state.currentState = State::REPRODUCE;
+			key.currentKey = KeyPressed::ANY;
 		break;
 		case KeyPressed::KEY_O:
 			goToNext(game.board);
-		game.graphic.updateTimer = 0.0f;
-		game.state.currentState = State::REPRODUCE;
-		key.currentKey = KeyPressed::ANY;
+			game.graphic.updateTimer = 0.0f;
+			game.state.currentState = State::REPRODUCE;
+			key.currentKey = KeyPressed::ANY;
 		break;	
 		}
 		
@@ -260,7 +263,7 @@ void drawNextPieces(Game & game)
 
 void drawGame(Game & game)
 {
-	if(game.state.currentState == State::PLAY)
+	if(game.state.currentState == State::PLAY || game.state.currentState == State::REPRODUCE)
 	{
 		drawBackgroundBoard(game);
 		drawPiecesTextures(game);

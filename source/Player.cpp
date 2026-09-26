@@ -102,7 +102,7 @@ string getTagData(string line , string tag1 , string tag2)
 }
 
 
-bool isPlayeRegisterOnFile(string name)
+bool isPlayerRegisterOnFile(string name)
 {
 	ifstream inFile;
 	
@@ -170,7 +170,7 @@ void addNewPlayerToFile(Player player)
 
 void writePlayerToFile(Player & player)
 {
-	if(isPlayeRegisterOnFile(player.name))
+	if(isPlayerRegisterOnFile(player.name))
 		updateRecordToPlayer(player.name , player.record);
 	else
 		addNewPlayerToFile(player);
@@ -207,6 +207,41 @@ PlayerNode * readPlayersFile()
 	inFile.close();
 	
 	return list;
+}
+
+bool modifyPlayerName(string name , string newName)
+{
+	ifstream inFile;
+	ofstream outTemp("temp.txt");
+	
+	if(!openInFile(inFile) || !outTemp.is_open())
+		return false;
+	bool wawModify = false;
+	
+	string line;
+	while(getline(inFile , line)){
+		string player  = getTagData(line , TAG_PLAYER_O , TAG_PLAYER_C);
+		string nameTag  = getTagData(line, TAG_NAME_O , TAG_NAME_C);
+		string recordTag = getTagData(line , TAG_RECORD_O , TAG_RECORD_C);
+		
+		if(player != "" && nameTag == name){
+			string nameModify  = TAG_NAME_O + newName + TAG_NAME_C;
+			string recordModify = TAG_RECORD_O + recordTag +  TAG_RECORD_C;
+			outTemp << TAG_PLAYER_O + nameModify + recordModify + TAG_PLAYER_C << endl;		
+			wawModify = true;
+		}
+		else	
+		   outTemp << line << endl;		
+	}
+	
+	inFile.close();
+	outTemp.close();
+	
+	remove(PLAYERS_FILE.c_str());
+	rename("temp.txt" , PLAYERS_FILE.c_str());
+	
+	return wawModify;
+	
 }
 
 void orderPlayerByBubbleSort(PlayerNode *& node)
@@ -268,7 +303,7 @@ PlayerNode* createParition(PlayerNode * begin , PlayerNode *& end , PlayerNode *
 	PlayerNode * stopCondition = end->next;
 	
 	while(current != stopCondition){
-		if(begin->player.record > current->player.record){
+		if(begin->player.record < current->player.record){
 			//CONEXION DEL ANTERIOR Y EL SIGUIENTE DEL NODO A MOVER
 			PlayerNode * save = current->next;
 			prevToCurrent->next = save;

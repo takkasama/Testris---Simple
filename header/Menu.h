@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "TextureGame.h"
 #include "State.h"
+
 using namespace std;
 
 
@@ -15,24 +16,35 @@ const int BUTTON_MENU_X_3 = 489.0f;
 //ESPACIOS DE TOP RECORDS DE JUGADORES 
 const float RECORD_BOX_X = 68.0f;
 const float RECORD_BOX_Y_INITIAL = 50.0f;
-const float RECORD_BOX_SPACING = 65.0f;
+const float RECORD_BOX_SPACING = 63.0f;
 
 const float TEXT_RECORD_Y_INITIAL = 70.0f;
-const float TEXT_RECORD_SPACING = 65.8f;
+const float TEXT_RECORD_SPACING = 63.8f;
 const float TEXT_RECORD_X =100.0f;
 
 const float TEXT_NAME_BOX_X = 70.0f;
 const float TEXT_NAME_BOX_Y = 700.0f;
+const float TEXT_NAME_X = 100.0f;
+const float TEXT_NAME_Y = 720.0f;
 
-const float FONT_SIZE_MENU = 50.0f;
+const float CLEAN_BUTTON_BOX_X = 502.0f;
+const float CLEAN_BUTTON_BOX_Y = 712.0f;
 
+
+const float FONT_SIZE_MENU_H1 = 40.0;
+const float FONT_SIZE_MENU_H3 = 20.0;
 
 struct Menu
 {
+	const static int MAX_LENGHT = 10;
+	
 	int totalPlayers;
 	Player * players;
+	
 	string textNameBox;	
-
+	string saveNameToModify;
+	int saveSelectedPos;
+	
 	Player selectedPlayer;
 	TextureGame * textures;
 };
@@ -48,6 +60,8 @@ void loadPlayerToFile();
 //MENU ACCION
 void verifyButtonsMenu(Menu & menu , State & state);
 void verifyBoxRecords(Menu & menu);
+void verifyTextInputNameBox(Menu & menu);
+
 
 //DIBUJO DE MENU
 void drawBackgroundMenu(Menu & menu);
