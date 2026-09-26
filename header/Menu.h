@@ -1,0 +1,57 @@
+#pragma once
+#include<iostream>
+#include "Player.h"
+#include "TextureGame.h"
+#include "State.h"
+using namespace std;
+
+
+//MENU BUTTONS 
+const int BUTTON_MENU_Y = 813.0f;
+const int BUTTON_MENU_X_1 = 51.5f;
+const int BUTTON_MENU_X_2 = 270.0f;
+const int BUTTON_MENU_X_3 = 489.0f;
+
+//ESPACIOS DE TOP RECORDS DE JUGADORES 
+const float RECORD_BOX_X = 68.0f;
+const float RECORD_BOX_Y_INITIAL = 50.0f;
+const float RECORD_BOX_SPACING = 65.0f;
+
+const float TEXT_RECORD_Y_INITIAL = 70.0f;
+const float TEXT_RECORD_SPACING = 65.8f;
+const float TEXT_RECORD_X =100.0f;
+
+const float TEXT_NAME_BOX_X = 70.0f;
+const float TEXT_NAME_BOX_Y = 700.0f;
+
+const float FONT_SIZE_MENU = 50.0f;
+
+
+struct Menu
+{
+	int totalPlayers;
+	Player * players;
+	string textNameBox;	
+
+	Player selectedPlayer;
+	TextureGame * textures;
+};
+
+
+void loadMenuTextures(Menu & menu);
+Menu buildMenu();
+
+//en caso de que no se encuentre en el top 10 - se buscara en el archivo para encontrar el archivo para ver si existe o no
+void loadPlayerToFile();
+
+
+//MENU ACCION
+void verifyButtonsMenu(Menu & menu , State & state);
+void verifyBoxRecords(Menu & menu);
+
+//DIBUJO DE MENU
+void drawBackgroundMenu(Menu & menu);
+void drawTopRecordPlayers(Menu & menu);
+
+void drawMenu(Menu & menu);
+

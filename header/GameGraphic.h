@@ -43,6 +43,10 @@ const float TEXT_Y_2 = 125.f;
 
 //FONT SIZE DEFUALT PARA EL BOARD
 const float FONT_SIZE = 50.0f;
+
+
+
+
 struct GameGraphic
 {
 	float updateTimer;
@@ -50,10 +54,11 @@ struct GameGraphic
 	float keyTimer;
 	
 	TextureGame *textures;
-	
 };
 
-void loadTextures(GameGraphic &graphic);
+
+
+void loadTextures(GameGraphic & graphic);
 GameGraphic buildGameGraphic();
 
 Position getTexturePosition(int x, int y);

@@ -110,7 +110,7 @@ void drawTexture(TextureGame *& texture , string nameFile , Position position)
 	DrawTexture(aux->texture , position.x , position.y , WHITE);
 }
 
-void dranText(TextureGame *& texture , string text , float fontSize , Position position)
+void drawText(TextureGame *& texture , string text , float fontSize , Position position)
 {	
 	if(texture == nullptr)
 		return;

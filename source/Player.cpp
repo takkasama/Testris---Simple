@@ -16,7 +16,7 @@ PlayerNode * buildPlayerNode()
 	playerNode->next = nullptr;
 	
 	playerNode->player = buildPlayer();
-	
+		
 	return playerNode;
 }
 
@@ -50,6 +50,21 @@ PlayerNode * getLastPlayerNode(PlayerNode *& node)
 	return current;
 }
 
+int getSizePlayerNode(PlayerNode * node)
+{
+	if(node == nullptr) return 0;
+	
+	PlayerNode * current = node;
+	
+	int size = 0;
+	
+	while(current != nullptr){
+		current = current->next;
+		size++;
+	}
+	
+	return size;
+}
 
 
 bool openOutFile(ofstream & outFile , bool isToAdd)
@@ -250,7 +265,9 @@ PlayerNode* createParition(PlayerNode * begin , PlayerNode *& end , PlayerNode *
 	//DECLARACION DEL NUEVO COMIENZO QUE SERIA EL CENTRAL DE LA PARTICION
 	PlayerNode * newBegin = begin;
 	
-	while(current != nullptr){
+	PlayerNode * stopCondition = end->next;
+	
+	while(current != stopCondition){
 		if(begin->player.record > current->player.record){
 			//CONEXION DEL ANTERIOR Y EL SIGUIENTE DEL NODO A MOVER
 			PlayerNode * save = current->next;
@@ -325,12 +342,12 @@ void orderPlayerByQuickSort(PlayerNode *& node)
 //METODO DE OBTENCION DEL TOP DE JUGADORES QUE RECIBBE UN PUNTERO DE UN ARREGLO DE 
 //DE JUGADORES, PARA EL LLENGADO DE ESTOS, DEL MISMO MODO DEL METODO DE ORDENACION QUE SE
 //DESEA PARA LOS JUGAORES
-void getTopPlayer(Player *& players , int size, bool isQuickSort)
+Player * getTopPlayer(bool isQuickSort , int & totalPlayers)
 {
 	PlayerNode * listPlayers = readPlayersFile();
 	
 	if(listPlayers == nullptr)
-		return;
+		return nullptr;
 	
 	if(isQuickSort)
 		orderPlayerByQuickSort(listPlayers);
@@ -339,12 +356,18 @@ void getTopPlayer(Player *& players , int size, bool isQuickSort)
 	
 	PlayerNode * current = listPlayers;
 	
-	for(int i = 0 ; i < size && current->next != nullptr; i++)
+	totalPlayers = getSizePlayerNode(listPlayers) <= 10 ? getSizePlayerNode(listPlayers) : 10;
+	
+	Player * players = new Player[totalPlayers];
+	
+	for(int i = 0 ; i < totalPlayers && current->next != nullptr; i++)
 	{
 		Player player = current->player;
 		players[i] = player;
 		
 		current = current->next;
 	}
+	
+	return players;
 }
 
