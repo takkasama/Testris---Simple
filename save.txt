@@ -14,3 +14,4 @@
 <player><name>Kira_000014</name><record>278640</record></player>
 <player><name>Nova_000015</name><record>90707</record></player>
 <player><name></name><record>0</record></player>
+<player><name>cansado</name><record>640</record></player>

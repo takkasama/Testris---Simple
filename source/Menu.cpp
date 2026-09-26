@@ -73,7 +73,7 @@ void verifyButtonsMenu(Menu & menu , State & state)
 				menu.saveSelectedPos = -1;
 			}
 		}
-		menu.selectedPlayer.name = menu.textNameBox;
+		menu.selectedPlayer.name = menu.textNameBox.empty() ? "NO NAME" : menu.textNameBox;
 		writePlayerToFile(menu.selectedPlayer);
 		
 		state.currentState = State::START_GAME;

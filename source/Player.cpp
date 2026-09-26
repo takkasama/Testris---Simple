@@ -5,7 +5,7 @@ Player buildPlayer()
 	Player player;
 	player.name = "NONE";
 	player.record = 0;
-	
+	player.points = 0;
 	return player;
 }
 
@@ -123,7 +123,7 @@ bool isPlayerRegisterOnFile(string name)
 	return false;	
 }
 
-void updateRecordToPlayer(string name, int record)
+void updateRecordToPlayer(Player & player)
 {
 	ifstream inFile;
 	ofstream outTemp("temp.txt");
@@ -131,6 +131,8 @@ void updateRecordToPlayer(string name, int record)
 	if(!openInFile(inFile) || !outTemp.is_open())
 		return;
 	
+	string name = player.name;
+	int record = player.record > player.points ? player.record : player.points;
 	
 	string line;
 	while(getline(inFile , line)){
@@ -171,7 +173,7 @@ void addNewPlayerToFile(Player player)
 void writePlayerToFile(Player & player)
 {
 	if(isPlayerRegisterOnFile(player.name))
-		updateRecordToPlayer(player.name , player.record);
+		updateRecordToPlayer(player);
 	else
 		addNewPlayerToFile(player);
 	

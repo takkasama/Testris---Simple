@@ -22,6 +22,7 @@ struct Player
 {
 	string name;
 	int record;
+	int points;
 };
 
 Player buildPlayer();
@@ -47,7 +48,7 @@ bool openInFile(ifstream & inFile);
 
 string getTagData(string line, string tag1, string tag2);
 bool isPlayerRegisterOnFile(string name);
-void updateRecordToPlayer(string name, int record);
+void updateRecordToPlayer(Player  & player);
 void addNewPlayerToFile(Player player);
 void writePlayerToFile(Player & player);
 //LECTURA DEL ARCHIVO DE SAVE, DE LOS PLAYERS Y CARGADO A LA LISTA DE JUGADORES

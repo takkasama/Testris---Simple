@@ -43,7 +43,14 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 			game.graphic.updateTimer -= game.level.speed;
 			
 			//SI NO PUEDO TERMINAR DE ACTULIZAR EL JUEGO ASUME QUE YA SE TERMINO
-			if(!updateBoard(game.board)) game.state.currentState = State::MENU;
+			if(!updateBoard(game.board)) {
+				game.currentPlayer.points = game.level.points;
+				writePlayerToFile(game.currentPlayer);
+				
+				game.menu.players = getTopPlayer();
+				
+				game.state.currentState = State::MENU;
+			}
 			
 			updateLevel(game.level, getFullRows(game.board));
 			
