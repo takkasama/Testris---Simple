@@ -22,7 +22,7 @@ Board buildBoard()
 	return board;
 }
 
-void cleanRow(Board & board , Row *&row)
+void cleanRow(Board & board , Row *&row , bool isToCleanBoard)
 {		
 	if(row->next != nullptr)
 		row->next->prev = row->prev;
@@ -41,7 +41,8 @@ void cleanRow(Board & board , Row *&row)
 	delete row;
 	Row * newRow = buildRow();
 	
-	addRow(board.top , board.bottom , newRow);
+	if(!isToCleanBoard)
+		addRow(board.top , board.bottom , newRow);
 	
 }
 
@@ -101,12 +102,12 @@ int getFullRows(Board & board)
 		Row *prev = current->prev;
 		
 		if(haveBombPieceOnRow(current) && isFillRow(current)){
-			cleanRow(board, current);
+			cleanRow(board, current , false);
 			sumFullRows = -1;
 		}
 		
 		if(isFillRow(current)){
-			cleanRow(board, current);
+			cleanRow(board, current , false);
 			sumFullRows = sumFullRows != -1 ? sumFullRows + 1 : -1;
 		}
 		
@@ -228,11 +229,10 @@ void goToNext(Board & board)
 		return;
 	}
 	
-	if(moveToNextHistorical(board.currentHistorical)){
-	
+	if(moveToNextHistorical(board.currentHistorical))	
 		board.currentPiece = board.currentHistorical->tetriPiece;
 	   
-	}
+	
 }
 
 void goToPrev(Board & board)
@@ -240,9 +240,9 @@ void goToPrev(Board & board)
 	if(board.currentHistorical == nullptr)
 		board.currentHistorical = getLastHistoric(board.historical);
 	
-	if(moveToPrevHistorial(board.currentHistorical)){
+	if(moveToPrevHistorial(board.currentHistorical))
 		board.currentPiece = board.currentHistorical->tetriPiece;
-	}
+	
 		
 }
 
@@ -380,6 +380,15 @@ bool updateBoard(Board & board)
 	return true;
 }
 
+void updateBoardToReproduce(Board & board)
+{
+	
+	if(canMoveDown(board))
+		return;
+
+	lockCurrentPiece(board);
+}
+
 //COLOCA LA PIEZA EN LA PARTE BAJA SI NO SE DESEA ESPERAR A QUE BASE EN EL CICLO NORMAL
 void moveToBottom(Board & board)
 {	
@@ -397,4 +406,17 @@ void cleanCellsToHistorical(Board & board)
 		if(row->cell[piece.x].isSelected)
 			row->cell[piece.x].isSelected = false;
 	}
+}
+
+void cleanBoard(Board & board)
+{
+	Row * current = board.bottom;
+	while(current != nullptr){
+		Row * prev = current->prev;
+		cleanRow(board , current , true);
+		current = prev;
+	}
+	
+	for (int i = 0; i < board.MAX_ROWS; i++)
+		addRow(board.top, board.bottom, buildRow());
 }

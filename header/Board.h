@@ -28,7 +28,7 @@ struct Board
 
 Board buildBoard();
 
-void cleanRow(Board & board, Row *& row);
+void cleanRow(Board & board , Row *&row , bool isToCleanBoard);
 void cleanTopRow(Board & board);
 	
 
@@ -74,6 +74,8 @@ void moveToBottom(Board & board);
 //INDICA QUE SI UNA PIEZA QUE ESTA MARCADA SE ENCUENTRA EN EL TOP DEL BOARD
 bool isBoardFull(Board & board);
 bool updateBoard(Board & board);
-
+void updateBoardToReproduce(Board & board);
+	
 //COLOCA LA PIEZA EN LA PARTE BAJA SI NO SE DESEA ESPERAR A QUE BASE EN EL CICLO NORMAL
 void cleanCellsToHistorical(Board & board);
+void cleanBoard(Board & board);

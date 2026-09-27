@@ -64,7 +64,8 @@ void verifyButtonsBoard(Game & game);
 void verifyButtonsPause(Game & game);
 void verifyButtonsGameOver(Game & game);
 void verifyEvents(Game & game);
-
+bool verifyButtonsReproduceGame(Game & game);
+	
 
 void updateGame(Game &game, KeyPressed & key ,float time);
 

@@ -27,11 +27,11 @@ void resetGame(Game & game)
 
 void reproduceGame(Game & game)
 {
-	
-	
-	
-	
-	
+	if(game.board.currentHistorical == nullptr)
+		game.board.currentHistorical = game.board.historical;
+
+	updateBoardToReproduce(game.board);
+	goToNext(game.board);
 	
 }
 
@@ -76,9 +76,10 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 			game.graphic.updateTimer -= game.level.speed;
 			
 			//SI NO PUEDO TERMINAR DE ACTULIZAR EL JUEGO ASUME QUE YA SE TERMINO
-			if(!updateBoard(game.board)) 
+			if(!updateBoard(game.board)) {
+				cleanBoard(game.board);
 				game.state.currentState = State::GAME_OVER;
-			
+			}
 			int fullRows = getFullRows(game.board);
 			updateLevel(game.level, fullRows);
 			game.eventQueue->currentRows += fullRows;
@@ -114,7 +115,14 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 	}
 	if(game.state.currentState == State::REPRODUCE_GAME)
 	{
-		reproduceGame(game);
+		game.graphic.updateTimer += time;
+		
+		if (!verifyButtonsReproduceGame(game) && 
+			game.graphic.updateTimer >= game.level.speed){
+			game.graphic.updateTimer -= game.level.speed;
+			reproduceGame(game);
+		}
+		else updateBoardToReproduce(game.board);
 		return;
 	}
 	
@@ -205,7 +213,9 @@ void verifyButtonsBoard(Game & game)
 void verifyButtonsPause(Game & game)
 {
 	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_T0_SUB_BACKGROUND_X_1 , BUTTON_T0_SUB_BACKGROUND_Y) , "start")){				
-		game.state.currentState = State::PLAY;
+		if(game.state.currentState == State::REPRODUCE_GAME)
+			game.state.currentState = State::REPRODUCE_GAME;
+		else game.state.currentState = State::PLAY;
 		return;
 	}
 	
@@ -227,6 +237,26 @@ void verifyButtonsGameOver(Game & game)
 	}
 }
 
+bool verifyButtonsReproduceGame(Game & game)
+{
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_1_X , BUTTON_Y) , "back")){
+		goToPrev(game.board);
+		return true;
+	}
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_2_X , BUTTON_Y) , "advance")){
+		goToNext(game.board);
+		return true;
+	}
+	if(isPressTexture( game.graphic.textures , buildPosition(BUTTON_3_X , BUTTON_Y) , "pause")){		
+		game.state.currentState = State::PAUSE;
+		return true;
+	}
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_4_X , BUTTON_Y) , "close")){				
+		reloadMenu(game.menu, game.state , game.level.points);
+		return true;
+	}
+	return false;
+}
 
 
 //DIBUJO DE JUEGO 
@@ -367,6 +397,8 @@ void drawGame(Game & game)
 	
 	if(game.state.currentState == State::REPRODUCE_GAME){
 		drawBackgroundBoard(game);
+		drawCurrentPiece(game);
+		drawPiecesTextures(game);
 	}
 	
 	
