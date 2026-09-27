@@ -1,4 +1,5 @@
 #include "../header/Menu.h"
+#include<iostream>
 
 void loadMenuTextures(Menu & menu)
 {

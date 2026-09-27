@@ -1,3 +1,4 @@
+#include<ctime>
 #include "header/Game.h"
 
 int main()
