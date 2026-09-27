@@ -8,7 +8,7 @@
 #include "Player.h"
 #include "State.h"
 #include "Menu.h"
-
+#include "Event.h"
 
 using namespace std;
 
@@ -43,17 +43,34 @@ struct Game
 	Player currentPlayer;
 	State state;
 	
+	
+	//LOS EVENTOS LOS MANEJA GAME DEBIDO A QUE SE MANEJAN EN VELOCIDAD DE CAIDA QUE
+	//LOS TIENE EL GAME Y LA GENERACION DE PIEZAS QUE LOS TIENE EL BOARD,
+	//POR LO QUE MANEJARA DE ARRIBA A ABAJO
+	EventQueue * eventQueue;
+	
 	Menu menu;
 };
 
 Game builGame();
 void resetGame(Game & game);
 
+void reproduceGame(Game & game);
+
 //VERIFICAINOES Y ACTUALIZACION DEL JUEGO
 void verifyKeys(Game & game, KeyPressed & key ,float time);
 void verifyButtonsBoard(Game & game);
 
+void verifyButtonsPause(Game & game);
+void verifyButtonsGameOver(Game & game);
+void verifyEvents(Game & game);
+
+
 void updateGame(Game &game, KeyPressed & key ,float time);
+
+
+void drawPause(Game & game);
+void drawGameOver(Game & game);	
 
 //DIBUJO DE JUEGO 
 void drawPiecesTextures(Game & game);
@@ -62,8 +79,6 @@ void drawBackground(Game & game);
 void drawHoldPiece(Game & game);
 void drawNextPieces(Game & game);
 
-
-	
 void drawGame(Game & game);
 
 

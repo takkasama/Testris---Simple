@@ -18,9 +18,11 @@ struct State
 	const static int MENU = 4;
 	//reproducir toda una partida despues de un gameover
 	const static int REPRODUCE_GAME = 5;
+	//mostrar ventana de gameover
+	const static int GAME_OVER = 6;
 	
 	//ESTADOS DE NAVEGACION DE MENU
-	const static int SETTINGS = 6;
+	const static int SETTINGS = 7;
 	
 	
 	int currentState;

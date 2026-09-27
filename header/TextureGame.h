@@ -8,7 +8,7 @@ using namespace std;
 const string PATH_PIECES = "resources/Pieces/";
 const string PATH_BUTTONS = "resources/Background/";	
 
-const string FONT_7_SEGMENT_PATH = "resources/fonts/EvilEmpire.otf";
+const string FONT_EVIL_EMPIRE = "resources/fonts/EvilEmpire.otf";
 //DrawRectangleLines(fontPosition.x, fontPosition.y, textSize.x, textSize.y, RED);
 //void DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);	
 struct Position

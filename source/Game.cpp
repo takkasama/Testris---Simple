@@ -10,7 +10,7 @@ Game builGame()
 	game.currentPlayer = buildPlayer();
 	
 	game.state.currentState = State::MENU;
-	
+	game.eventQueue = buildEventQueue();
 	game.menu = buildMenu();
 	
 	return game;
@@ -25,6 +25,37 @@ void resetGame(Game & game)
 	game.state.currentState = State::PLAY;
 }
 
+void reproduceGame(Game & game)
+{
+	
+	
+	
+	
+	
+	
+}
+
+void verifyEvents(Game & game)
+{
+	Event event = getNextEvent(game.eventQueue);
+	
+	if(event.currentEvent == Event::NONE) 
+		return;
+	
+	if(event.currentEvent == Event::UPGRADE_SPEED){
+		updateSpeed(game.level);
+		game.eventQueue->currentRows -= Event::CONDITION_EVENT_UPDAGRADE_SPEED;
+	}
+	if(event.currentEvent == Event::RAND_BOMB){
+		randSpecialPiece(game.board , false);
+		game.eventQueue->currentRows -= Event::CONDITION_EVENT_BOMB;
+	}
+	if(event.currentEvent == Event::RAND_PIECE_BLOCK){
+		randSpecialPiece(game.board , true);
+		game.eventQueue->currentRows -= Event::CONDITION_EVENT_BLOCK;
+ 	}
+}
+
 void updateGame(Game &game, KeyPressed & key ,float time)
 {
 	
@@ -37,7 +68,7 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 		
 		verifyKeys(game , key , time);
 		verifyButtonsBoard(game);
-		
+			
 		
 		
 		if (game.graphic.updateTimer >= game.level.speed)
@@ -46,18 +77,23 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 			
 			//SI NO PUEDO TERMINAR DE ACTULIZAR EL JUEGO ASUME QUE YA SE TERMINO
 			if(!updateBoard(game.board)) 
-				reloadMenu(game.menu , game.state, game.level.points);
+				game.state.currentState = State::GAME_OVER;
 			
+			int fullRows = getFullRows(game.board);
+			updateLevel(game.level, fullRows);
+			game.eventQueue->currentRows += fullRows;
 			
-			updateLevel(game.level, getFullRows(game.board));
+			verifyEvents(game);
 			
 		}
 		return;
 	}
 	if(game.state.currentState == State::PAUSE){
-		
-		
-		//PUASE ACTION
+		verifyButtonsPause(game);
+		return;
+	}
+	if(game.state.currentState == State::GAME_OVER){
+		verifyButtonsGameOver(game);
 		return;
 	}
 	if(game.state.currentState == State::REPRODUCE){
@@ -74,6 +110,11 @@ void updateGame(Game &game, KeyPressed & key ,float time)
 	}
 	if(game.state.currentState == State::MENU || game.state.currentState == State::SETTINGS){
 		verifyMenu(game.menu , game.state);
+		return;
+	}
+	if(game.state.currentState == State::REPRODUCE_GAME)
+	{
+		reproduceGame(game);
 		return;
 	}
 	
@@ -161,6 +202,32 @@ void verifyButtonsBoard(Game & game)
 	
 }
 
+void verifyButtonsPause(Game & game)
+{
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_T0_SUB_BACKGROUND_X_1 , BUTTON_T0_SUB_BACKGROUND_Y) , "start")){				
+		game.state.currentState = State::PLAY;
+		return;
+	}
+	
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_T0_SUB_BACKGROUND_X_2 , BUTTON_T0_SUB_BACKGROUND_Y) , "exit")){				
+		reloadMenu(game.menu, game.state , game.level.points);
+		return;
+	}
+}
+void verifyButtonsGameOver(Game & game)
+{
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_T0_SUB_BACKGROUND_X_1 , BUTTON_T0_SUB_BACKGROUND_Y) , "reload")){				
+		game.state.currentState = State::REPRODUCE_GAME;
+		return;
+	}
+	
+	if(isPressTexture(game.graphic.textures , buildPosition(BUTTON_T0_SUB_BACKGROUND_X_2 , BUTTON_T0_SUB_BACKGROUND_Y) , "exit")){				
+		reloadMenu(game.menu, game.state , game.level.points);
+		return;
+	}
+}
+
+
 
 //DIBUJO DE JUEGO 
 void drawPiecesTextures(Game & game)
@@ -174,7 +241,6 @@ void drawPiecesTextures(Game & game)
 			
 			if (!currentRow->cell[x].isSelected)
 				continue;
-			
 			
 			string nameImg = "Tetri" + string(1, currentRow->cell[x].type);			
 			Position pos = getTexturePosition(x, y);
@@ -263,16 +329,46 @@ void drawNextPieces(Game & game)
 }
 
 
+
+void drawPause(Game & game)
+{
+	drawTexture(game.graphic.textures , "pauseBackground" , {SUB_BACKGROUND_X , SUB_BACKGROUND_Y});
+	drawTexture(game.graphic.textures , "start" , {BUTTON_T0_SUB_BACKGROUND_X_1 , BUTTON_T0_SUB_BACKGROUND_Y});
+	drawTexture(game.graphic.textures , "exit" , {BUTTON_T0_SUB_BACKGROUND_X_2 , BUTTON_T0_SUB_BACKGROUND_Y});
+	
+}
+
+void drawGameOver(Game & game)
+{
+	drawTexture(game.graphic.textures , "gameOverBackground" , {SUB_BACKGROUND_X , SUB_BACKGROUND_Y});
+	drawTexture(game.graphic.textures , "reload" , {BUTTON_T0_SUB_BACKGROUND_X_1 , BUTTON_T0_SUB_BACKGROUND_Y});
+	drawTexture(game.graphic.textures , "exit" , {BUTTON_T0_SUB_BACKGROUND_X_2 , BUTTON_T0_SUB_BACKGROUND_Y});
+}
+
+
+
+
 void drawGame(Game & game)
 {
-	if(game.state.currentState == State::PLAY || game.state.currentState == State::REPRODUCE)
+	if(game.state.currentState == State::PLAY || game.state.currentState == State::REPRODUCE
+	   || game.state.currentState == State::GAME_OVER || game.state.currentState == State::PAUSE)
 	{
 		drawBackgroundBoard(game);
 		drawPiecesTextures(game);
 		drawCurrentPiece(game);
 		drawNextPieces(game);
 		drawHoldPiece(game);
+		
+		if(game.state.currentState == State::PAUSE) drawPause(game);
+		
+		if(game.state.currentState == State::GAME_OVER) drawGameOver(game);
+		
 	}
+	
+	if(game.state.currentState == State::REPRODUCE_GAME){
+		drawBackgroundBoard(game);
+	}
+	
 	
 	if(game.state.currentState == State::MENU || game.state.currentState == State::SETTINGS)
 		drawMenu(game.menu, game.state);

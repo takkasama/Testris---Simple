@@ -44,6 +44,12 @@ const float TEXT_Y_2 = 125.f;
 //FONT SIZE DEFUALT PARA EL BOARD
 const float FONT_SIZE = 50.0f;
 
+const float SUB_BACKGROUND_X = 95.0f;
+const float SUB_BACKGROUND_Y = 200.0f;
+
+const float BUTTON_T0_SUB_BACKGROUND_Y = 460.0f;
+const float BUTTON_T0_SUB_BACKGROUND_X_1 = 130.0f;
+const float BUTTON_T0_SUB_BACKGROUND_X_2 = 390.0f;
 
 
 

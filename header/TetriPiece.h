@@ -34,6 +34,7 @@ TetriPiece buildL();
 TetriPiece buildJ();
 TetriPiece buildO();
 TetriPiece buildDefault();
-
+TetriPiece buildBomb();
+	
 //RESET DE LA POSICION DE LA PIEZA A LA INICIAL PARA EL HOLD
 void resetPosition(TetriPiece &tetriPiece);

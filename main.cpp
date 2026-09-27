@@ -17,13 +17,13 @@ int main()
 	while (!WindowShouldClose()) {
 		float time = GetFrameTime();
 		
-		if(IsKeyDown(KEY_J)) key.currentKey = KeyPressed::KEY_J;
-		else if(IsKeyDown(KEY_L)) key.currentKey = KeyPressed::KEY_L;
-		else if(IsKeyDown(KEY_K)) key.currentKey = KeyPressed::KEY_K;
-		else if(IsKeyDown(KEY_H)) key.currentKey = KeyPressed::KEY_H;
-		else if(IsKeyDown(KEY_SPACE)) key.currentKey = KeyPressed::KEY_SPACE;
-		else if(IsKeyDown(KEY_O)) key.currentKey = KeyPressed::KEY_O;
-		else if(IsKeyDown(KEY_U)) key.currentKey = KeyPressed::KEY_U;
+		if(IsKeyPressed(KEY_J)) key.currentKey = KeyPressed::KEY_J;
+		else if(IsKeyPressed(KEY_L)) key.currentKey = KeyPressed::KEY_L;
+		else if(IsKeyPressed(KEY_K)) key.currentKey = KeyPressed::KEY_K;
+		else if(IsKeyPressed(KEY_H)) key.currentKey = KeyPressed::KEY_H;
+		else if(IsKeyPressed(KEY_SPACE)) key.currentKey = KeyPressed::KEY_SPACE;
+		else if(IsKeyPressed(KEY_O)) key.currentKey = KeyPressed::KEY_O;
+		else if(IsKeyPressed(KEY_U)) key.currentKey = KeyPressed::KEY_U;
 		
 		
 		updateGame(game, key , time);

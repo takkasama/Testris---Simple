@@ -1,17 +1,6 @@
-<player><name>Takka_000001</name><record>100</record></player>
-<player><name>Yuki_000002</name><record>11</record></player>
-<player><name>Retro_000003</name><record>12</record></player>
-<player><name>Rin_000004</name><record>4000</record></player>
-<player><name>Nova_000005</name><record>40</record></player>
-<player><name>nuevo</name><record>201</record></player>
-<player><name>takka</name><record>300</record></player>
-<player><name>Frost_000008</name><record>400</record></player>
-<player><name>Yuki_000009</name><record>1</record></player>
-<player><name>Raven_000010</name><record>985069</record></player>
-<player><name>Akira_000011</name><record>462947</record></player>
-<player><name>Yuki_000012</name><record>256084</record></player>
-<player><name>Nova_000013</name><record>276542</record></player>
-<player><name>Kira_000014</name><record>278640</record></player>
-<player><name>Nova_000015</name><record>90707</record></player>
-<player><name></name><record>0</record></player>
-<player><name>cansado</name><record>640</record></player>
+<player><name>Yuki0027</name><record>684</record></player>
+<player><name>Shad</name><record>1975</record></player>
+<player><name>Neko0030</name><record>580</record></player>
+<player><name>Sora</name><record>1734</record></player>
+<player><name>takkasama</name><record>0</record></player>
+<player><name>NO NAME</name><record>0</record></player>
