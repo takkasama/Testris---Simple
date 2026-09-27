@@ -19,14 +19,11 @@ void updateLevel(Level &level, int rows)
 	
 	level.currentRows += rows;
 	
-	if (level.currentRows >= level.currentLevel * CONDITION_UPLEVEL)
-	{
-		level.currentLevel++;
-		level.speed = INITIAL_SPEED - ((level.currentLevel - 1) * SPEED_MODIFIER);
-	}
-	
 	switch (rows)
 	{
+	case -1:
+		level.points -= POINTS_TETRIS;
+		break;
 	case 1:
 		level.points += POINTS_SIMPLE;
 		break;
@@ -40,4 +37,10 @@ void updateLevel(Level &level, int rows)
 		level.points += POINTS_TETRIS;
 		break;
 	}
+}
+
+void updateSpeed(Level & level)
+{
+	level.speed = INITIAL_SPEED - ((level.currentLevel - 1) * SPEED_MODIFIER);
+
 }

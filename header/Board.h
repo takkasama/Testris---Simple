@@ -6,7 +6,7 @@
 #include "Hold.h"
 #include "Historical.h"
 #include "Row.h"
-
+#include "Event.h"
 
 
 // ORGANIZACION DE LAS FILAS ADEMAS DE ACCESO A LA PARTE INFERIOR PARA LA LECTURA DE LA VERFICACIONES DE ESTADO DE LAS FILAS
@@ -29,9 +29,15 @@ struct Board
 Board buildBoard();
 
 void cleanRow(Board & board, Row *& row);
+void cleanTopRow(Board & board);
+	
+
 Row * getRow(Board & board, int y);
 bool isUsedCell(Board & board, int x, int y);
 int getFullRows(Board & board);
+
+void randSpecialPiece(Board & board , bool isBlockPiece);
+
 
 //SE USARA POR CADA CICLO DE JUEGO PARA ACTUALIZAR LA POS DE LAS PIEZAS
 bool canMoveDown(Board & board);
@@ -57,16 +63,17 @@ void goToPrev(Board & board);
 void updateHistorial(Board & board);
 void loadNextPiece(Board & board);
 void holdPiece(Board & board);
+void applyEvent(Board & board , Event event);
 
 void moveRight(Board & board);
 void moveLeft(Board & board);
 void rotate(Board & board);
 void moveDown(Board & board);
+void moveToBottom(Board & board);
 
 //INDICA QUE SI UNA PIEZA QUE ESTA MARCADA SE ENCUENTRA EN EL TOP DEL BOARD
 bool isBoardFull(Board & board);
 bool updateBoard(Board & board);
 
 //COLOCA LA PIEZA EN LA PARTE BAJA SI NO SE DESEA ESPERAR A QUE BASE EN EL CICLO NORMAL
-void moveToBottom(Board & board);
 void cleanCellsToHistorical(Board & board);

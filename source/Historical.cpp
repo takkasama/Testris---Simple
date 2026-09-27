@@ -1,13 +1,12 @@
 #include "../header/Historical.h"
 
-
 Historical * buildHistoric()
 {
 	Historical * historic = new Historical;
 	historic->tetriPiece = buildDefault();
 	historic->next = nullptr;
 	historic->prev = nullptr;
-	
+		
 	historic->pos = 0;
 	historic->size = 0;
 	return historic;
@@ -66,6 +65,7 @@ void addHistoric(Historical *&historic, TetriPiece tetripiece)
 	newHistoric->pos = historic->size;
 	historic->size++;
 }
+
 
 Historical *getLastHistoric(Historical *historic)
 {

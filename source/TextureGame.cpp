@@ -18,7 +18,7 @@ TextureGame * buildTextureGame(string nameFile, bool isTetriTexture)
 		PATH_BUTTONS + nameFile + ".png";	
 	texture->texture = LoadTexture(texturePath.c_str());
 	
-	texture->font = LoadFont(FONT_7_SEGMENT_PATH.c_str());
+	texture->font = LoadFont(FONT_EVIL_EMPIRE.c_str());
 	
 	texture->x = 0;
 	texture->y = 0;

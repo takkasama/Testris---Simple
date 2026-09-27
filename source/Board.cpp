@@ -10,7 +10,7 @@ Board buildBoard()
 	//GESTORES DE PIEZAS
 	board.queueBag =  buildQueueBag();
 	board.hold = buildHold();
-	
+		
 	board.currentPiece = getNextPiece(board.queueBag);
 	
 	board.historical = nullptr;
@@ -43,6 +43,21 @@ void cleanRow(Board & board , Row *&row)
 	
 	addRow(board.top , board.bottom , newRow);
 	
+}
+
+void cleanTopRow(Board & board)
+{
+	if(board.top == nullptr) return;
+	
+	Row * save = board.top;
+	board.top = board.top->next;
+	
+	if(board.top != nullptr)
+		board.top->prev = nullptr;
+	else
+		board.bottom = nullptr;
+	
+	delete save;
 }
 
 Row * getRow(Board & board , int y)
@@ -81,14 +96,18 @@ int getFullRows(Board & board)
 	Row *current = board.bottom;
 	
 	int sumFullRows = 0;
-	
 	while(current != nullptr)
 	{
 		Row *prev = current->prev;
 		
+		if(haveBombPieceOnRow(current) && isFillRow(current)){
+			cleanRow(board, current);
+			sumFullRows = -1;
+		}
+		
 		if(isFillRow(current)){
 			cleanRow(board, current);
-			sumFullRows++;
+			sumFullRows = sumFullRows != -1 ? sumFullRows + 1 : -1;
 		}
 		
 		current = prev;
@@ -98,6 +117,22 @@ int getFullRows(Board & board)
 }
 
 
+
+//SE USARA PARA COLOCAR BLOCQUES ESPECIALES EN POS RANDON
+
+void randSpecialPiece(Board & board , bool isBlockPiece)
+{
+	int x = rand() % Row::MAX_COLUMNS;
+	int y = rand() % Board::MAX_ROWS ;
+	
+	TetriPiece piece = isBlockPiece ? buildDefault() : buildBomb();
+	piece.pieces[0].x = x;
+	piece.pieces[0].x = y;
+
+	updateCellToSpecialPiece(getRow(board, y)->cell[x], piece.type , true , isBlockPiece);		
+
+	addHistoric(board.historical , piece);
+}
 
 //SE USARA POR CADA CICLO DE JUEGO PARA ACTUALIZAR LA POS DE LAS PIEZAS
 bool canMoveDown(Board & board)
@@ -193,8 +228,11 @@ void goToNext(Board & board)
 		return;
 	}
 	
-	if(moveToNextHistorical(board.currentHistorical))
-	   board.currentPiece = board.currentHistorical->tetriPiece;
+	if(moveToNextHistorical(board.currentHistorical)){
+	
+		board.currentPiece = board.currentHistorical->tetriPiece;
+	   
+	}
 }
 
 void goToPrev(Board & board)
@@ -202,8 +240,10 @@ void goToPrev(Board & board)
 	if(board.currentHistorical == nullptr)
 		board.currentHistorical = getLastHistoric(board.historical);
 	
-	if(moveToPrevHistorial(board.currentHistorical))
+	if(moveToPrevHistorial(board.currentHistorical)){
 		board.currentPiece = board.currentHistorical->tetriPiece;
+	}
+		
 }
 
 
@@ -358,8 +398,3 @@ void cleanCellsToHistorical(Board & board)
 			row->cell[piece.x].isSelected = false;
 	}
 }
-
-
-
-
-

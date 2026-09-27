@@ -10,7 +10,9 @@ void loadTextures(GameGraphic &graphic)
 	addTexture(graphic.textures, "TetriS", true);
 	addTexture(graphic.textures, "TetriT", true);
 	addTexture(graphic.textures, "TetriZ", true);
+	
 	addTexture(graphic.textures, "TetriD", true);
+	addTexture(graphic.textures, "TetriB", true);
 	
 	
 	addTexture(graphic.textures, "TetriCI", true);
@@ -22,18 +24,19 @@ void loadTextures(GameGraphic &graphic)
 	addTexture(graphic.textures, "TetriCZ", true);
 	
 	addTexture(graphic.textures, "pause", false);
-	addTexture(graphic.textures, "retry", false);
-	addTexture(graphic.textures, "menu", false);
-	
-	addTexture(graphic.textures, "info", false);
-	
 	addTexture(graphic.textures, "back", false);
-	addTexture(graphic.textures, "advance", false);
-	
-	addTexture(graphic.textures, "delete", false);
+	addTexture(graphic.textures, "advance", false);	
 	addTexture(graphic.textures, "close", false);
 	
+	addTexture(graphic.textures, "reload", false);
+	addTexture(graphic.textures, "exit", false);	
+	addTexture(graphic.textures, "start", false);
+	
 	addTexture(graphic.textures, "boardBackground", false);
+	addTexture(graphic.textures, "pauseBackground", false);
+	addTexture(graphic.textures, "gameOverBackground", false);
+	
+	
 }
 
 GameGraphic buildGameGraphic()

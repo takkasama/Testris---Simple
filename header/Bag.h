@@ -1,5 +1,6 @@
 #pragma once
 #include "TetriPiece.h"
+#include <iostream>
 
 struct Bag
 {

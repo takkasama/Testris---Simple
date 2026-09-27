@@ -7,12 +7,21 @@ Cell buildCell()
 	Cell cell;
 	cell.type = 'D';
 	cell.isSelected = false;
-	
+	cell.isBlockPiece = false;
+	cell.isBombPiece = false;
 	return cell;
 }
 
 void updateCell(Cell &cell, char type, bool isSelected)
 {
+	cell.isSelected = isSelected;
+	cell.type = type;
+}
+
+void updateCellToSpecialPiece(Cell &cell, char type, bool isSelected , bool isBlockPiece)
+{
+	cell.isBlockPiece = isBlockPiece;
+	cell.isBombPiece = !isBlockPiece;
 	cell.isSelected = isSelected;
 	cell.type = type;
 }
@@ -50,11 +59,24 @@ bool isSelectedCell(Row *row, int posX)
 
 bool isFillRow(Row *row)
 {
-	for(int i = 0 ; i < Row::MAX_COLUMNS ; i++)
-		if(!row->cell[i].isSelected)
-		return false;
+	for(int i = 0 ; i < Row::MAX_COLUMNS ; i++){
+		if(!row->cell[i].isSelected || row->cell[i].isBlockPiece)
+			return false;
+		
+	}
 	
 	return true;
+}
+
+bool haveBombPieceOnRow(Row *& row)
+{
+	for(int i = 0 ; i < Row::MAX_COLUMNS ; i++){
+		if(row->cell[i].isBombPiece)
+			return true;
+		
+	}
+	
+	return false;
 }
 
 void addRow(Row *&top, Row *&botton, Row *newRow)

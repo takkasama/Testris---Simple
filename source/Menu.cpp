@@ -142,6 +142,7 @@ void verifyButtonsSettings(Menu & menu , State & state)
 	if(isPressTexture(menu.textures , {BUTTON_TYPE_SORT_X_1 , BUTTON_TYPE_SORT_Y}, "empty")){
 		menu.isQuickSort = true;
 		reloadPlayers(menu);
+		state.currentState = State::MENU;
 		return;
 	}
 	if(isPressTexture(menu.textures , {BUTTON_TYPE_SORT_X_2 , BUTTON_TYPE_SORT_Y}, "empty")){
@@ -158,7 +159,7 @@ void verifyBoxRecords(Menu & menu)
 {
 	float pos = RECORD_BOX_Y_INITIAL;
 	
-	for(int i = 0; i < menu.totalPlayers - 1; i++)
+	for(int i = 0; i < menu.totalPlayers; i++)
 	{
 		if(isPressTexture(menu.textures , {RECORD_BOX_X , pos}, "playerRecordBox")){
 			menu.saveNameToModify = menu.players[i].name;

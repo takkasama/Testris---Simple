@@ -1,6 +1,5 @@
 #include "../header/Bag.h"
 
-#include<iostream>
 
 bool isEmptyBag(Bag bag) { return bag.curentPieces < 0; }
 

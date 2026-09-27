@@ -10,6 +10,9 @@ struct Cell
 	
 	// INDICADOR DE SI CELDA ESTA SELECIONADAS
 	bool isSelected;
+	
+	bool isBlockPiece;
+	bool isBombPiece;
 };
 
 // LISTA DOBLEMENTE ENLAZADA REQUERIDA PARA LA CONSTRUCCION DEL TABLERO
@@ -26,6 +29,7 @@ struct Row
 Cell buildCell();
 
 void updateCell(Cell &cell, char type, bool isSelected);
+void updateCellToSpecialPiece(Cell &cell, char type, bool isSelected , bool isBlockPiece);
 
 void cleanCell(Cell &cell);
 
@@ -37,5 +41,6 @@ Row *buildRow();
 bool isSelectedCell(Row *row, int posX);
 
 bool isFillRow(Row *row);
+bool haveBombPieceOnRow(Row *& row);	
 
 void addRow(Row *&top, Row *&botton, Row *newRow);

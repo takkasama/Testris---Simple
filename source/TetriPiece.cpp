@@ -144,6 +144,17 @@ TetriPiece buildDefault()
 	return tetriPiece;
 }
 
+TetriPiece buildBomb()
+{
+	TetriPiece tetriPiece;
+	tetriPiece.pieces[0] = buildPiece(0, 0);
+	
+	tetriPiece.type = 'B';
+	
+	return tetriPiece;
+}
+
+
 void resetPosition(TetriPiece &tetriPiece)
 {
 	if (tetriPiece.type == 'S')
