@@ -1,6 +1,1 @@
-<player><name>Yuki0027</name><record>684</record></player>
-<player><name>Shad</name><record>1975</record></player>
-<player><name>Neko</name><record>580</record></player>
-<player><name>Sora</name><record>1734</record></player>
-<player><name>takkasama</name><record>0</record></player>
 <player><name>NO NAME</name><record>0</record></player>

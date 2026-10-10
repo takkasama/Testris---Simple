@@ -1,0 +1,3 @@
+/home/takkasama/Share-Folder/Testris---Simple/build-windows/CMakeFiles/Tetris.dir
+/home/takkasama/Share-Folder/Testris---Simple/build-windows/CMakeFiles/edit_cache.dir
+/home/takkasama/Share-Folder/Testris---Simple/build-windows/CMakeFiles/rebuild_cache.dir
